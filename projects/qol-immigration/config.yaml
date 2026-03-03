@@ -1,0 +1,47 @@
+# Project configuration — Quality of Life in the USA vs. Immigration Trends
+
+name: qol-immigration
+title: "Quality of Life in the USA vs. Immigration Trends"
+status: planned
+
+narrative_hypothesis: >
+  How politicians have sold out the American people and diluted their vote and
+  the American knowledge base by systematically immigrating susceptible
+  populations and strategically placing them in districts and cities so they can
+  ensure the USA never moves away from the 2-party political system — and how
+  this has contributed to a substantial drop in quality of living in this
+  country for the 98% of Americans who are not millionaire+ rich.
+
+# Indicators — open-ended; add new categories and variables at any time.
+# Each indicator maps to a data source in data/raw/ and appears in the data catalog.
+indicators: []
+  # Example:
+  # - name: median_household_income
+  #   category: economic
+  #   source: census_acs
+  #   time_range: "1990-2024"
+  #   geo_level: county
+  #   direction_of_good: higher
+  #   tags: [income, wealth]
+
+# Custom hypotheses — relationships to test using narrative reframing patterns.
+# Patterns: masking, displacement, divergence, lag_lead, segmentation, threshold
+hypotheses: []
+  # Example:
+  # - name: "Military recruitment masks unemployment"
+  #   pattern: masking
+  #   hidden_variable: military_recruitment_rate
+  #   surface_variable: unemployment_rate
+  #   expected: >
+  #     Periods of high recruitment coincide with lower reported unemployment,
+  #     but underlying job quality (wages, benefits) does not improve.
+  #   indicators: [military_recruitment_rate, unemployment_rate, median_wages]
+
+# Data sources — populated during Phase 1 (Find).
+data_sources: []
+  # Example:
+  # - name: census_acs
+  #   url: https://data.census.gov/
+  #   format: csv
+  #   license: public_domain
+  #   notes: "ACS 5-year estimates"

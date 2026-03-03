@@ -1,0 +1,26 @@
+# Data Adventures — Python dependencies
+# Install: pip install -r requirements.txt
+
+# Data processing
+pandas
+pyarrow
+
+# Statistical analysis
+scipy
+statsmodels
+
+# Changepoint detection
+ruptures
+
+# Clustering and outlier detection
+scikit-learn
+
+# Interactive charts
+plotly
+
+# Notebooks
+jupyter
+nbconvert
+
+# Configuration
+pyyaml
