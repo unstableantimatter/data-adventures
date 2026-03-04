@@ -1,0 +1,23 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# IDE / OS
+.DS_Store
+.idea/
+*.swp
+*.swo
+
+# Large or generated data (optional — uncomment if reports/data get big)
+# projects/*/data/raw/*.csv
+# projects/*/data/processed/*.parquet
+# projects/*/reports/*.html

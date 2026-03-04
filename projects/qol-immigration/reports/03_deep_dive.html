@@ -7823,7 +7823,7 @@ and analysis type below.</p>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Loaded 19 dataset(s)
+<pre>Loaded 4 dataset(s): ['state_panel', 'national_panel', 'district_crosssection', 'state_panel_national']
 </pre>
 </div>
 </div>
@@ -7835,18 +7835,7 @@ and analysis type below.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Finding-Details">Finding Details<a class="anchor-link" href="#Finding-Details">¶</a></h2><p>Update these variables to match the finding you're investigating.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput">
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Regression-Analysis">Regression Analysis<a class="anchor-link" href="#Regression-Analysis">¶</a></h2>
+<h2 id="Deep-dive-1:-QoL-vs-GDP-divergence">Deep-dive 1: QoL vs GDP divergence<a class="anchor-link" href="#Deep-dive-1:-QoL-vs-GDP-divergence">¶</a></h2><p>Does median household income diverge from GDP growth over time? (Hypothesis: states with higher immigration see greater divergence.)</p>
 </div>
 </div>
 </div>
@@ -7857,7 +7846,97 @@ and analysis type below.</p>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Could not find/merge columns: ['', '']
+<pre>Normalized to base year = 100.
+Maximum divergence at 2023: gap = 27.8 index points.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Deep-dive-2:-Immigration-%E2%86%92-income-lag">Deep-dive 2: Immigration → income lag<a class="anchor-link" href="#Deep-dive-2:-Immigration-%E2%86%92-income-lag">¶</a></h2><p>Does foreign-born share lead or lag median household income? (National annual series.)</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Best correlation at lag=0: r=0.4787
+Positive lag means foreign_born_pct leads median_household_income by that many years.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Deep-dive-3:-Housing-threshold">Deep-dive 3: Housing threshold<a class="anchor-link" href="#Deep-dive-3:-Housing-threshold">¶</a></h2><p>Is there a tipping point of foreign-born share above which home prices (HPI) jump?</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Binned analysis (10 bins):
+   x_mean     y_mean  count
+ 2.176196 293.985788     92
+ 3.530870 336.818043     92
+ 4.298043 341.780109     92
+ 5.150659 337.122857     91
+ 6.260645 354.357500     93
+ 7.847912 382.966016     91
+ 9.955714 424.134066     91
+13.240217 476.356168     92
+15.934348 529.068940     92
+21.993152 514.577174     92
+
+Possible threshold near foreign_born_pct = 5.15: relationship direction changes.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="(Optional)-More-deep-dives">(Optional) More deep-dives<a class="anchor-link" href="#(Optional)-More-deep-dives">¶</a></h2><p>Template sections below: set ANALYSIS_TYPE and variables to run regression, segmented comparison, before/after, or other patterns.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>Skipped (optional).
 </pre>
 </div>
 </div>
@@ -7869,7 +7948,7 @@ and analysis type below.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Lag-Analysis">Lag Analysis<a class="anchor-link" href="#Lag-Analysis">¶</a></h2>
+<h2 id="Before/After-(optional)">Before/After (optional)<a class="anchor-link" href="#Before/After-(optional)">¶</a></h2>
 </div>
 </div>
 </div>
@@ -7880,7 +7959,7 @@ and analysis type below.</p>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Skipping lag analysis (not selected).
+<pre>Skipped (optional).
 </pre>
 </div>
 </div>
@@ -7892,7 +7971,7 @@ and analysis type below.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Segmented-Comparison">Segmented Comparison<a class="anchor-link" href="#Segmented-Comparison">¶</a></h2>
+<h2 id="Other-patterns-(optional)">Other patterns (optional)<a class="anchor-link" href="#Other-patterns-(optional)">¶</a></h2>
 </div>
 </div>
 </div>
@@ -7903,53 +7982,7 @@ and analysis type below.</p>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child">
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Skipping segmented comparison (not selected).
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Before/After-Analysis">Before/After Analysis<a class="anchor-link" href="#Before/After-Analysis">¶</a></h2>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput">
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Skipping before/after analysis (not selected).
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Narrative-Pattern-Test">Narrative Pattern Test<a class="anchor-link" href="#Narrative-Pattern-Test">¶</a></h2>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noInput">
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Skipping pattern test (not selected or no pattern specified).
+<pre>Skipped (optional).
 </pre>
 </div>
 </div>

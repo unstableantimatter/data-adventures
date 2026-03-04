@@ -45,7 +45,7 @@ Research projects to run through the pipeline.
 
 | ID | Project | Status | Directory |
 |----|---------|--------|-----------|
-| S-1 | Quality of Life in the USA vs. Immigration Trends | Planned | `projects/qol-immigration/` |
+| S-1 | Quality of Life in the USA vs. Immigration Trends | Phase 5 (Execute & share) | `projects/qol-immigration/` |
 
 ### S-1: Quality of Life in the USA vs. Immigration Trends
 
@@ -70,4 +70,4 @@ Items gated on prerequisites or deferred by design.
 
 ---
 
-*Last updated: 2026-03-02*
+*Last updated: 2026-03-04*
