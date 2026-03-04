@@ -29,12 +29,12 @@ Items to build or improve in the pipeline itself.
 |----|------|--------|
 | P-1 | Documentation suite (BRD, infrastructure, analytical framework, LLM integration, agentic hierarchy, decisions, data catalog) | Done |
 | P-2 | Directory structure and project scaffolding | Done |
-| P-3 | `run.py` — single entrypoint that runs data scripts, executes notebooks, exports HTML | Planned |
-| P-4 | Layer 1 — automatic descriptive pass (univariate profiles, trends, correlations, changepoints) | Planned |
-| P-5 | Layer 2 — flagging engine (rank findings by significance, divergence, outlier regions) | Planned |
-| P-6 | Layer 3 — directed deep-dive templates (regression, lag, segmentation, before/after, narrative threading) | Planned |
-| P-7 | Notebook export pipeline (nbconvert execution + HTML output to `reports/`) | Planned |
-| P-8 | Narrative reframing pattern library (masking, displacement, divergence, lag/lead, segmentation, threshold) | Planned |
+| P-3 | `run.py` — single entrypoint that runs data scripts, executes notebooks, exports HTML | Done |
+| P-4 | Layer 1 — automatic descriptive pass (univariate profiles, trends, correlations, changepoints) | Done |
+| P-5 | Layer 2 — flagging engine (rank findings by significance, divergence, outlier regions) | Done |
+| P-6 | Layer 3 — directed deep-dive templates (regression, lag, segmentation, before/after, narrative threading) | Done |
+| P-7 | Notebook export pipeline (nbconvert execution + HTML output to `reports/`) | Done |
+| P-8 | Narrative reframing pattern library (masking, displacement, divergence, lag/lead, segmentation, threshold) | Done |
 | P-9 | Docs health check — periodic review that validates all markdown docs against repo state, config, and each other. Script (`pipeline/docs_check.py`) + checklist (`docs/docs_review_checklist.md`) | Done (checklist); Planned (script) |
 
 ---

@@ -2,7 +2,7 @@
 
 name: qol-immigration
 title: "Quality of Life in the USA vs. Immigration Trends"
-status: planned
+status: phase_3_analyze
 
 narrative_hypothesis: >
   How politicians have sold out the American people and diluted their vote and
@@ -12,36 +12,255 @@ narrative_hypothesis: >
   this has contributed to a substantial drop in quality of living in this
   country for the 98% of Americans who are not millionaire+ rich.
 
-# Indicators — open-ended; add new categories and variables at any time.
-# Each indicator maps to a data source in data/raw/ and appears in the data catalog.
-indicators: []
-  # Example:
-  # - name: median_household_income
-  #   category: economic
-  #   source: census_acs
-  #   time_range: "1990-2024"
-  #   geo_level: county
-  #   direction_of_good: higher
-  #   tags: [income, wealth]
+indicators:
+  # --- Economic QoL ---
+  - name: median_household_income
+    category: economic
+    source: census_acs
+    time_range: "1990-2024"
+    geo_level: state
+    direction_of_good: higher
+    tags: [income, wealth, middle_class]
 
-# Custom hypotheses — relationships to test using narrative reframing patterns.
-# Patterns: masking, displacement, divergence, lag_lead, segmentation, threshold
-hypotheses: []
-  # Example:
-  # - name: "Military recruitment masks unemployment"
-  #   pattern: masking
-  #   hidden_variable: military_recruitment_rate
-  #   surface_variable: unemployment_rate
-  #   expected: >
-  #     Periods of high recruitment coincide with lower reported unemployment,
-  #     but underlying job quality (wages, benefits) does not improve.
-  #   indicators: [military_recruitment_rate, unemployment_rate, median_wages]
+  - name: real_median_weekly_earnings
+    category: economic
+    source: bls_cps
+    time_range: "1990-2024"
+    geo_level: national
+    direction_of_good: higher
+    tags: [wages, labor]
 
-# Data sources — populated during Phase 1 (Find).
-data_sources: []
-  # Example:
-  # - name: census_acs
-  #   url: https://data.census.gov/
-  #   format: csv
-  #   license: public_domain
-  #   notes: "ACS 5-year estimates"
+  - name: gini_coefficient
+    category: economic
+    source: fred_census
+    time_range: "1967-2024"
+    geo_level: national
+    direction_of_good: lower
+    tags: [inequality, income_distribution]
+
+  - name: poverty_rate
+    category: economic
+    source: census_saipe
+    time_range: "1990-2024"
+    geo_level: state
+    direction_of_good: lower
+    tags: [poverty, economic_hardship]
+
+  - name: home_price_to_income_ratio
+    category: economic
+    source: census_nar_fhfa
+    time_range: "1998-2024"
+    geo_level: state
+    direction_of_good: lower
+    tags: [housing, affordability]
+
+  - name: state_gdp_per_capita
+    category: economic
+    source: bea_gdp
+    time_range: "1997-2024"
+    geo_level: state
+    direction_of_good: higher
+    tags: [gdp, growth, productivity]
+
+  # --- Health ---
+  - name: life_expectancy
+    category: health
+    source: cdc_wonder
+    time_range: "1990-2023"
+    geo_level: state
+    direction_of_good: higher
+    tags: [health, mortality, wellbeing]
+
+  # --- Education ---
+  - name: high_school_graduation_rate
+    category: education
+    source: nces_ccd
+    time_range: "2005-2024"
+    geo_level: state
+    direction_of_good: higher
+    tags: [education, attainment]
+
+  - name: college_attainment_rate
+    category: education
+    source: census_acs
+    time_range: "1990-2024"
+    geo_level: state
+    direction_of_good: higher
+    tags: [education, attainment, skill]
+
+  # --- Immigration ---
+  - name: foreign_born_population_share
+    category: immigration
+    source: mpi_census
+    time_range: "1990-2022"
+    geo_level: state
+    direction_of_good: null
+    tags: [immigration, demographics]
+
+  - name: lawful_permanent_residents
+    category: immigration
+    source: dhs_yearbook
+    time_range: "2002-2023"
+    geo_level: state
+    direction_of_good: null
+    tags: [immigration, legal_flows]
+
+  - name: refugee_arrivals
+    category: immigration
+    source: dhs_yearbook
+    time_range: "2002-2023"
+    geo_level: state
+    direction_of_good: null
+    tags: [immigration, refugee, resettlement]
+
+  # --- Political ---
+  - name: voter_turnout
+    category: political
+    source: uf_elections_project
+    time_range: "1980-2024"
+    geo_level: state
+    direction_of_good: higher
+    tags: [political, participation, democracy]
+
+  - name: cook_pvi
+    category: political
+    source: cook_political
+    time_range: "1997-2025"
+    geo_level: district
+    direction_of_good: null
+    tags: [political, partisanship, gerrymandering]
+
+  - name: noncitizen_apportionment_impact
+    category: political
+    source: cis_census
+    time_range: "1990-2020"
+    geo_level: state
+    direction_of_good: null
+    tags: [political, redistricting, immigration, representation]
+
+hypotheses:
+  - name: "Immigration concentrated in competitive districts"
+    pattern: segmentation
+    segment_variable: cook_pvi_numeric
+    outcome_variable: foreign_born_pct
+    expected: >
+      Foreign-born population growth is disproportionately concentrated in
+      politically competitive or party-favorable districts.
+    indicators: [foreign_born_pct, cook_pvi_numeric]
+    note: "Requires cross-panel join (state_panel × district_crosssection). Layer 3."
+
+  - name: "QoL diverges from GDP as immigration rises"
+    pattern: divergence
+    outcome_variable: median_household_income
+    predictor_variable: foreign_born_pct
+    expected: >
+      States with higher immigration growth show greater divergence between
+      GDP growth and median household income growth.
+    indicators: [median_household_income, foreign_born_pct, real_gdp_millions]
+
+  - name: "Immigration precedes QoL decline with lag"
+    pattern: lag_lead
+    predictor_variable: foreign_born_pct
+    outcome_variable: median_household_income
+    expected: >
+      Increases in foreign-born population share precede declines (or slower
+      growth) in median household income by 5-10 years.
+    indicators: [foreign_born_pct, median_household_income]
+
+  - name: "Noncitizen populations shift congressional seats"
+    pattern: segmentation
+    segment_variable: cook_pvi_numeric
+    outcome_variable: voter_reg_total_pct
+    expected: >
+      States that gain House seats due to noncitizen populations shift
+      partisan lean in a predictable direction.
+    indicators: [cook_pvi_numeric, voter_reg_total_pct]
+    note: "cook_pvi_numeric in district_crosssection, voter_reg in state_panel. Layer 3."
+
+  - name: "Housing affordability collapses in high-immigration states"
+    pattern: threshold
+    predictor_variable: foreign_born_pct
+    outcome_variable: hpi_annual_avg
+    expected: >
+      There is a threshold of foreign-born population share above which
+      housing price growth accelerates sharply.
+    indicators: [foreign_born_pct, hpi_annual_avg]
+
+data_sources:
+  - name: census_acs
+    url: https://data.census.gov/
+    format: csv
+    license: public_domain
+    notes: "ACS 1-year (2005+) and 5-year estimates. Decennial Census for 1990/2000. Income, poverty, education, demographics by state/county."
+
+  - name: census_saipe
+    url: https://www.census.gov/data/datasets/time-series/demo/income-poverty/data-extracts/income-poverty-data-files.html
+    format: csv
+    license: public_domain
+    notes: "Small Area Income and Poverty Estimates. State and county poverty rates 1990-2024."
+
+  - name: bls_cps
+    url: https://data.bls.gov/timeseries/LEU0252881600
+    format: csv
+    license: public_domain
+    notes: "Median usual weekly earnings, real and nominal, 1979-present. National level. Quarterly and annual."
+
+  - name: fred_census
+    url: https://fred.stlouisfed.org/series/GINIALLRF
+    format: csv
+    license: public_domain
+    notes: "Gini coefficient for US income distribution 1947-present. Annual. Also household-level by race."
+
+  - name: census_nar_fhfa
+    url: https://www.census.gov/topics/housing/housing-affordability/data/tables.html
+    format: csv_excel
+    license: public_domain
+    notes: "Census housing data + NAR median prices + FHFA House Price Index. State and metro level."
+
+  - name: cdc_wonder
+    url: https://wonder.cdc.gov/
+    format: csv
+    license: public_domain
+    notes: "Compressed Mortality File 1968-2016; US State Life Tables 2018-2022. Life expectancy by state."
+
+  - name: nces_ccd
+    url: https://nces.ed.gov/ccd/drpcompstatelvl.asp
+    format: excel
+    license: public_domain
+    notes: "Common Core of Data. HS graduation rates by state 2005+. Digest of Education Statistics for college attainment."
+
+  - name: mpi_census
+    url: https://www.migrationpolicy.org/programs/data-hub/charts/immigrant-population-state-1990-present
+    format: interactive_csv
+    license: public_use
+    notes: "Foreign-born population by state 1990-present. Uses Decennial Census and ACS data."
+
+  - name: dhs_yearbook
+    url: https://www.dhs.gov/ohss/topics/immigration/yearbook
+    format: excel
+    license: public_domain
+    notes: "Yearbook of Immigration Statistics 2002-2023. LPRs, refugees, naturalizations, asylum by state."
+
+  - name: uf_elections_project
+    url: https://www.electproject.org/election-data/voter-turnout-data
+    format: csv_excel
+    license: cc_noncommercial
+    notes: "Voter turnout by state 1980-2024. National turnout 1787-present. UF Election Lab."
+
+  - name: cook_political
+    url: https://www.cookpolitical.com/cook-pvi
+    format: csv_spreadsheet
+    license: public_use
+    notes: "Cook PVI by congressional district and state, 1997-2025. Downloadable spreadsheets."
+
+  - name: cis_census
+    url: https://cis.org/Camarota/How-NonCitizens-Impact-Political-Representation-and-Partisan-Makeup-US-House
+    format: report_data
+    license: public_use
+    notes: "Center for Immigration Studies analysis of noncitizen apportionment impact. Uses Census data. NOTE: CIS is an advocacy org with a stated restrictionist position — cross-reference with neutral sources."
+
+  - name: bea_gdp
+    url: https://apps.bea.gov/regional/downloadzip.cfm
+    format: csv
+    license: public_domain
+    notes: "Bureau of Economic Analysis. Real GDP by state, 1997-present. Annual."

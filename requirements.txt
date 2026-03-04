@@ -4,6 +4,7 @@
 # Data processing
 pandas
 pyarrow
+openpyxl
 
 # Statistical analysis
 scipy
