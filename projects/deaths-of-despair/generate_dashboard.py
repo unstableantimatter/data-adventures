@@ -29,6 +29,13 @@ import plotly.io as pio
 sys.path.insert(0, str(Path(__file__).parents[2]))
 from pipeline.config import load_config, get_data_processed_dir
 
+# Embed Plotly.js so dashboard works offline and when opened via file:// (no CDN).
+# Python 6.x bundles Plotly.js 3.x; loading 2.27 from CDN causes binary data mismatch.
+# Plotly.js must match Python's plotly package version. Python 6.x bundles v3.x;
+# loading v2.27 from CDN causes binary data (bdata/dtype) to be misdecoded → blank charts.
+# Embed the bundled script so the dashboard works offline and from file://.
+from plotly.io._html import get_plotlyjs
+
 # ---------------------------------------------------------------------------
 # Load our real CDC data
 # ---------------------------------------------------------------------------
@@ -138,6 +145,14 @@ settlements_df = pd.DataFrame(settlements).sort_values("amount_b", ascending=Fal
 _LEGEND = dict(bgcolor="rgba(0,0,0,0.3)", font=dict(color="#e8eaf6"))
 _LEGEND_H = dict(bgcolor="rgba(0,0,0,0.3)", font=dict(color="#e8eaf6"), orientation="h", y=1.08)
 
+# Tooltip styling: darker bg, larger font, no truncation
+_HOVERLABEL = dict(
+    bgcolor="rgba(15,21,37,0.95)",
+    bordercolor="rgba(255,255,255,0.2)",
+    font=dict(color="#e8eaf6", size=13, family="Georgia"),
+    namelength=-1,  # show full trace names (no truncation)
+)
+
 DARK_LAYOUT = dict(
     paper_bgcolor="rgba(0,0,0,0)",
     plot_bgcolor="rgba(255,255,255,0.03)",
@@ -146,6 +161,7 @@ DARK_LAYOUT = dict(
     xaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#9ca3af")),
     yaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#9ca3af")),
     margin=dict(l=50, r=30, t=60, b=50),
+    hoverlabel=_HOVERLABEL,
 )
 
 
@@ -154,12 +170,21 @@ def dark(height: int = 440, **kwargs) -> dict:
     return {**DARK_LAYOUT, "height": height, **kwargs}
 
 
+_CHART_CONFIG = {
+    "displayModeBar": True,
+    "displaylogo": False,
+    "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+    "responsive": True,
+}
+
+
 def fig_to_div(fig, div_id: str) -> str:
+    """Embed a Plotly figure as a self-contained HTML div."""
     return fig.to_html(
         full_html=False,
         include_plotlyjs=False,
         div_id=div_id,
-        config={"displayModeBar": True, "displaylogo": False, "modeBarButtonsToRemove": ["lasso2d","select2d"]},
+        config=_CHART_CONFIG,
     )
 
 
@@ -214,51 +239,127 @@ def make_chart_waves():
     return fig_to_div(fig, "chart_waves")
 
 
-# --- Chart 2: Animated choropleth map ---
+# --- Chart 2: Year-over-year map (animation frames + slider + play) ---
+# Frame-based animation to test if it works over HTTP. Choropleth requires redraw=True.
 def make_chart_map():
     anim_data = state_panel.dropna(subset=["deaths_despair_rate","state_abbr"]).sort_values(["year","state_abbr"])
     max_rate = float(anim_data["deaths_despair_rate"].quantile(0.97))
+    years = sorted(anim_data["year"].unique())
+    locations = list(anim_data[anim_data["year"] == years[0]].sort_values("state_abbr")["state_abbr"])
 
-    fig = px.choropleth(
-        anim_data,
-        locations="state_abbr",
-        locationmode="USA-states",
-        color="deaths_despair_rate",
-        animation_frame="year",
-        scope="usa",
-        color_continuous_scale=[
-            [0.0, "#1a0a0a"], [0.2, "#4a1010"], [0.4, "#8b1a1a"],
-            [0.6, "#c0392b"], [0.8, "#e74c3c"], [1.0, "#ff6b6b"],
-        ],
-        range_color=[0, max_rate],
-        hover_data={
-            "state_abbr": False, "state_name": True,
-            "overdose_death_rate": ":.1f",
-            "suicide_rate": ":.1f",
-            "deaths_despair_rate": ":.1f",
-        },
-        labels={
-            "deaths_despair_rate": "Deaths per 100k",
-            "overdose_death_rate": "Overdose rate",
-            "suicide_rate": "Suicide rate",
-            "state_name": "State",
-        },
-    )
+    def _choropleth_for_year(yr):
+        df_yr = anim_data[anim_data["year"] == yr].sort_values("state_abbr")
+        return go.Choropleth(
+            locations=locations,
+            z=[float(v) for v in df_yr["deaths_despair_rate"]],
+            locationmode="USA-states",
+            colorscale=[
+                [0.0, "#1a0a0a"], [0.2, "#4a1010"], [0.4, "#8b1a1a"],
+                [0.6, "#c0392b"], [0.8, "#e74c3c"], [1.0, "#ff6b6b"],
+            ],
+            zmin=0,
+            zmax=max_rate,
+            customdata=df_yr[["state_abbr", "state_name", "overdose_death_rate", "suicide_rate", "deaths_despair_rate"]].values.tolist(),
+            hovertemplate="<b>%{customdata[1]}</b><br>Overdose: %{customdata[2]:.1f}<br>Suicide: %{customdata[3]:.1f}<br>Combined: %{customdata[4]:.1f} per 100k<extra></extra>",
+            colorbar=dict(title="Deaths per 100k", tickfont=dict(color="#9ca3af")),
+        )
+
+    # Initial data = first year
+    initial = _choropleth_for_year(years[0])
+    frames = [
+        go.Frame(
+            data=[_choropleth_for_year(yr)],
+            name=str(yr),
+            layout=dict(title=dict(text=f"Deaths of Despair per 100,000 — {yr}")),
+        )
+        for yr in years
+    ]
+
+    # Play/Pause buttons
+    play_pause = [
+        dict(
+            label="Play",
+            method="animate",
+            args=[
+                None,
+                {
+                    "frame": {"duration": 400, "redraw": True},
+                    "fromcurrent": True,
+                    "transition": {"duration": 200},
+                },
+            ],
+        ),
+        dict(
+            label="Pause",
+            method="animate",
+            args=[
+                [None],
+                {"frame": {"duration": 0, "redraw": False}, "mode": "immediate"},
+            ],
+        ),
+    ]
+
+    # Slider steps for scrubbing
+    slider_steps = [
+        dict(
+            args=[
+                [str(yr)],
+                {"frame": {"duration": 0, "redraw": True}, "mode": "immediate"},
+            ],
+            label=str(yr),
+            method="animate",
+        )
+        for yr in years
+    ]
+
+    fig = go.Figure(data=[initial], frames=frames)
     fig.update_layout(
+        geo=dict(scope="usa", bgcolor="rgba(0,0,0,0)", lakecolor="rgba(0,0,0,0)",
+                 landcolor="rgba(30,30,50,1)", showlakes=True,
+                 subunitcolor="rgba(255,255,255,0.2)"),
         paper_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#e8eaf6"),
         height=520,
-        margin=dict(l=0, r=0, t=20, b=0),
-        coloraxis_colorbar=dict(
-            title="Deaths per 100k",
-            tickfont=dict(color="#9ca3af"),
-        ),
-        geo=dict(bgcolor="rgba(0,0,0,0)", lakecolor="rgba(0,0,0,0)",
-                 landcolor="rgba(30,30,50,1)", showlakes=True,
-                 subunitcolor="rgba(255,255,255,0.2)"),
+        margin=dict(l=0, r=0, t=60, b=60),
+        hoverlabel=_HOVERLABEL,
+        title=dict(text=f"Deaths of Despair per 100,000 — {years[0]}", font=dict(size=16, color="#f8f9fa")),
+        updatemenus=[
+            dict(
+                type="buttons",
+                direction="left",
+                pad=dict(r=10, t=10),
+                x=0.01,
+                xanchor="left",
+                y=0.99,
+                yanchor="top",
+                bgcolor="rgba(20,20,35,0.9)",
+                bordercolor="rgba(255,255,255,0.2)",
+                font=dict(color="#e8eaf6", size=12),
+                buttons=play_pause,
+            )
+        ],
+        sliders=[
+            dict(
+                active=0,
+                yanchor="top",
+                xanchor="left",
+                currentvalue=dict(
+                    font=dict(size=13, color="#e8eaf6"),
+                    prefix="Year: ",
+                    visible=True,
+                    xanchor="center",
+                ),
+                pad=dict(b=10, t=50),
+                len=0.9,
+                x=0.05,
+                y=0,
+                bgcolor="rgba(20,20,35,0.7)",
+                bordercolor="rgba(255,255,255,0.2)",
+                tickcolor="rgba(255,255,255,0.5)",
+                steps=slider_steps,
+            )
+        ],
     )
-    fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 700
-    fig.layout.updatemenus[0].buttons[0].args[1]["transition"]["duration"] = 300
     return fig_to_div(fig, "chart_map")
 
 
@@ -325,14 +426,16 @@ def make_chart_market():
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(go.Scatter(
         x=merged["year"], y=merged["market_m"] / 1000,
-        name="U.S. Opioid Market ($B)",
+        name="Opioid Market ($B)",
         mode="lines", line=dict(color="#f59e0b", width=3),
         fill="tozeroy", fillcolor="rgba(245,158,11,0.12)",
+        hovertemplate="%{x}<br>Market: $%{y:.1f}B<extra></extra>",
     ), secondary_y=False)
     fig.add_trace(go.Scatter(
         x=merged["year"], y=merged["overdose_death_rate"],
-        name="Overdose Death Rate (per 100k)",
+        name="Overdose Rate (per 100k)",
         mode="lines+markers", line=dict(color="#ef4444", width=3),
+        hovertemplate="%{x}<br>Deaths: %{y:.1f} per 100k<extra></extra>",
     ), secondary_y=True)
     fig.update_layout(
         **dark(440),
@@ -340,12 +443,12 @@ def make_chart_market():
         hovermode="x unified",
         legend=_LEGEND_H,
     )
-    fig.update_yaxes(title_text="Opioid Market Size ($Billions)", secondary_y=False, gridcolor="rgba(255,255,255,0.08)")
-    fig.update_yaxes(title_text="Overdose Deaths per 100k", secondary_y=True, showgrid=False)
+    fig.update_yaxes(title_text="Opioid Market Size ($Billions)", secondary_y=False, gridcolor="rgba(255,255,255,0.08)", hoverformat=".1f")
+    fig.update_yaxes(title_text="Overdose Deaths per 100k", secondary_y=True, showgrid=False, hoverformat=".1f")
     return fig_to_div(fig, "chart_market")
 
 
-# --- Chart 6: Animated scatter — manufacturing vs. despair ---
+# --- Chart 6: Manufacturing vs. despair scatter (dropdown, no animation frames) ---
 def make_chart_mfg_scatter():
     base_2000 = state_panel[state_panel["year"] == 2000][
         ["state_abbr","deaths_despair_rate","manufacturing_employees_thousands"]
@@ -357,22 +460,35 @@ def make_chart_mfg_scatter():
     panel["ddr_change"] = panel["deaths_despair_rate"] - panel["ddr_2000"]
     panel["mfg_change_pct"] = (panel["manufacturing_employees_thousands"] - panel["mfg_2000"]) / panel["mfg_2000"] * 100
 
-    anim = panel[(panel["year"] >= 2000) & panel["mfg_change_pct"].notna() & panel["ddr_change"].notna()].copy()
+    # Start from 2001: in 2000, mfg_change_pct=0 and ddr_change=0 for all states → all points at origin
+    anim = panel[(panel["year"] >= 2001) & panel["mfg_change_pct"].notna() & panel["ddr_change"].notna()].copy()
+    years = sorted(anim["year"].unique())
 
-    fig = px.scatter(
-        anim, x="mfg_change_pct", y="ddr_change",
-        animation_frame="year", text="state_abbr", color="region",
-        color_discrete_map={
-            "Rust Belt / Appalachia": "#ef4444", "Rust Belt": "#dc2626",
-            "Appalachia": "#f59e0b", "Coastal Metro": "#3b82f6", "Other": "#6b7280",
-        },
-        range_x=[-55, 20], range_y=[-5, 45],
-        labels={
-            "mfg_change_pct": "% Change in Manufacturing Jobs (since 2000)",
-            "ddr_change": "Rise in Deaths of Despair per 100k (since 2000)",
-        },
-    )
-    fig.update_traces(textposition="top center", marker=dict(size=8, line=dict(width=1, color="rgba(255,255,255,0.3)")))
+    REGION_COLOR = {"Rust Belt / Appalachia": "#ef4444", "Rust Belt": "#dc2626",
+                    "Appalachia": "#f59e0b", "Coastal Metro": "#3b82f6", "Other": "#6b7280"}
+
+    traces_per_year = []
+    for yr in years:
+        df_yr = anim[anim["year"] == yr]
+        traces = []
+        for region in sorted(df_yr["region"].unique()):
+            rdf = df_yr[df_yr["region"] == region]
+            traces.append(
+                go.Scatter(
+                    x=rdf["mfg_change_pct"],
+                    y=rdf["ddr_change"],
+                    text=rdf["state_abbr"],
+                    mode="markers+text",
+                    name=region,
+                    marker=dict(size=8, color=REGION_COLOR.get(region, "#6b7280"),
+                               line=dict(width=1, color="rgba(255,255,255,0.3)")),
+                    textposition="top center",
+                    showlegend=True,
+                )
+            )
+        traces_per_year.append(traces)
+
+    fig = go.Figure(data=traces_per_year[0])
     fig.add_hline(y=0, line_dash="dash", line_color="rgba(255,255,255,0.2)")
     fig.add_vline(x=0, line_dash="dash", line_color="rgba(255,255,255,0.2)")
     fig.update_layout(
@@ -381,9 +497,36 @@ def make_chart_mfg_scatter():
         font=dict(color="#e8eaf6", family="Georgia"),
         height=460,
         legend=_LEGEND,
-        margin=dict(l=60, r=30, t=50, b=60),
+        margin=dict(l=60, r=30, t=60, b=60),
+        hoverlabel=_HOVERLABEL,
+        xaxis=dict(title="% Change in Manufacturing Jobs (since 2000)", range=[-55, 20], gridcolor="rgba(255,255,255,0.08)"),
+        yaxis=dict(title="Rise in Deaths of Despair per 100k (since 2000)", range=[-5, 45], gridcolor="rgba(255,255,255,0.08)"),
+        title=dict(text=f"Mfg Job Loss vs Deaths of Despair — {years[0]}", font=dict(size=14, color="#f8f9fa")),
+        updatemenus=[
+            dict(
+                type="dropdown",
+                direction="down",
+                x=0.01,
+                y=0.99,
+                yanchor="top",
+                xanchor="left",
+                bgcolor="rgba(20,20,35,0.9)",
+                bordercolor="rgba(255,255,255,0.2)",
+                font=dict(color="#e8eaf6", size=12),
+                buttons=[
+                    dict(
+                        label=str(yr),
+                        method="update",
+                        args=[
+                            {"data": traces_per_year[i]},
+                            {"title": {"text": f"Mfg Job Loss vs Deaths of Despair — {yr}"}},
+                        ],
+                    )
+                    for i, yr in enumerate(years)
+                ],
+            )
+        ],
     )
-    fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 700
     return fig_to_div(fig, "chart_mfg")
 
 
@@ -438,18 +581,34 @@ def make_chart_two_americas():
     )
 
     fig = go.Figure()
-    for grp, color, dash in [("High Mfg Loss States", "#ef4444", "solid"), ("Stable Mfg States", "#3b82f6", "dot")]:
+    # Add Stable Mfg first so the fill="tonexty" on High Mfg Loss fills the
+    # gap between the two lines (not from zero).
+    for grp, color, dash, fill in [
+        ("Stable Mfg States", "#3b82f6", "dot", None),
+        ("High Mfg Loss States", "#ef4444", "solid", "tonexty"),
+    ]:
         d = ta[ta["mfg_group"] == grp].sort_values("year")
         fig.add_trace(go.Scatter(
             x=d["year"], y=d["deaths_despair_rate"],
             name=grp, mode="lines+markers",
             line=dict(color=color, width=3, dash=dash),
-            fill="tonexty" if grp == "High Mfg Loss States" else None,
-            fillcolor="rgba(239,68,68,0.07)",
+            fill=fill,
+            fillcolor="rgba(239,68,68,0.10)",
         ))
     fig.update_layout(
         **dark(440),
-        title="Two Americas: States That Lost Manufacturing vs. Those That Kept It",
+        title=dict(
+            text="Two Americas: States That Lost Manufacturing vs. Those That Kept It",
+            font=dict(size=16, color="#f8f9fa"),
+        ),
+        annotations=[
+            dict(
+                text="Deaths of despair = drug overdoses + suicides. Both rise faster where factories closed.",
+                xref="paper", yref="paper", x=0.5, y=1.02,
+                xanchor="center", yanchor="bottom", showarrow=False,
+                font=dict(size=11, color="#9ca3af"),
+            ),
+        ],
         xaxis_title="Year", yaxis_title="Avg Deaths of Despair per 100k",
         legend=_LEGEND_H,
     )
@@ -463,7 +622,7 @@ print("Generating charts...")
 chart_waves = make_chart_waves()
 print("  ✓ Waves + Purdue revenue")
 chart_map = make_chart_map()
-print("  ✓ Animated choropleth map")
+print("  ✓ Year-selector map")
 chart_rx = make_chart_rx_vs_deaths()
 print("  ✓ Prescribing rate vs. deaths")
 chart_pills = make_chart_pills_state()
@@ -471,7 +630,7 @@ print("  ✓ ARCOS pills per capita")
 chart_market = make_chart_market()
 print("  ✓ Opioid market size")
 chart_mfg = make_chart_mfg_scatter()
-print("  ✓ Manufacturing scatter animation")
+print("  ✓ Manufacturing scatter (year selector)")
 chart_settlements = make_chart_settlements()
 print("  ✓ Legal settlements")
 chart_two_americas = make_chart_two_americas()
@@ -501,7 +660,8 @@ HTML = f"""<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Quiet Epidemic — Deaths of Despair Dashboard</title>
-  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <!-- Python plotly 6.x bundles Plotly.js 3.x. Loading 2.27 causes binary data mismatch → blank charts. -->
+  <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@3.4.0/plotly.min.js" charset="utf-8"></script>
   <style>
     :root {{
       --bg: #080c18;
@@ -565,9 +725,75 @@ HTML = f"""<!DOCTYPE html>
     .hero-subtitle {{
       font-size: clamp(1.1rem, 2.5vw, 1.4rem);
       color: var(--muted);
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
       font-style: italic;
     }}
+    .hero-lead {{
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }}
+    .hero-lead strong {{ color: var(--red); }}
+    .hero-narrative {{ display: flex; flex-direction: column; gap: 1.5rem; align-items: center; }}
+    .hero-narrative-row {{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 1rem;
+    }}
+    .hero-narrative-row.hero-epicenter {{ margin-top: 0.5rem; }}
+    .hero-plus {{
+      align-self: center;
+      font-size: 1.5rem;
+      color: var(--muted);
+      font-weight: 300;
+    }}
+    .hero-stat .sublabel {{
+      font-size: 0.7rem;
+      color: var(--subtext);
+      text-transform: none;
+      letter-spacing: 0;
+      margin-top: 0.15rem;
+      display: block;
+    }}
+    .hero-stat-primary {{ border-color: rgba(239,68,68,0.3); }}
+    .hero-stat-amber .num {{ color: var(--amber); }}
+    .hero-stat-amber {{ border-color: rgba(245,158,11,0.25); }}
+    .hero-stat-blue .num {{ color: var(--blue); }}
+    .hero-stat-blue {{ border-color: rgba(59,130,246,0.25); }}
+    .hero-stat-epicenter {{ border-color: rgba(59,130,246,0.35); min-width: 180px; }}
+    .hero-stat-epicenter .callout-num {{ font-size: 1.1rem; color: var(--blue); margin-top: 0.3rem; display: block; }}
+    .hero-journey {{ margin: 2.5rem 0 1.5rem; }}
+    .hero-journey-title {{ font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 1rem; }}
+    .hero-journey-steps {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }}
+    .hero-step {{
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: var(--text); text-decoration: none; font-size: 0.9rem;
+      transition: background 0.2s, border-color 0.2s;
+    }}
+    .hero-step:hover {{ background: rgba(255,255,255,0.1); border-color: rgba(239,68,68,0.4); }}
+    .hero-step-num {{ font-family: 'Courier New', monospace; font-weight: 700; color: var(--red); font-size: 0.8rem; }}
+    .hero-cta {{
+      display: inline-block;
+      margin: 1rem 0 1.5rem;
+      padding: 1rem 2rem;
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 4px 20px rgba(239,68,68,0.3);
+    }}
+    .hero-cta:hover {{ background: #dc2626; transform: translateY(-2px); }}
     .hero-stats {{
       display: flex;
       justify-content: center;
@@ -615,6 +841,7 @@ HTML = f"""<!DOCTYPE html>
     .section {{
       padding: 5rem 0;
       border-top: 1px solid rgba(255,255,255,0.05);
+      scroll-margin-top: 2rem;
     }}
     .section-tag {{
       font-family: 'Courier New', monospace;
@@ -766,45 +993,76 @@ HTML = f"""<!DOCTYPE html>
     <h1>The <span>Quiet</span> Epidemic</h1>
     <p class="hero-subtitle">How Big Pharma Flooded America with Opioids — and Profited While Communities Died</p>
 
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <span class="num">{total_od:,}</span>
-        <span class="label">Drug Overdose Deaths<br>1999–2016</span>
+    <p class="hero-lead">
+      Drug overdoses and suicides are grouped as <strong>"deaths of despair"</strong> — they share the same root cause:
+      economic collapse, lost purpose, and broken communities. Where factories closed and hope vanished, both rose together.
+    </p>
+
+    <div class="hero-narrative">
+      <div class="hero-narrative-row">
+        <div class="hero-stat hero-stat-primary">
+          <span class="num">{total_od:,}</span>
+          <span class="label">Drug Overdose Deaths</span>
+          <span class="sublabel">1999–2016</span>
+        </div>
+        <span class="hero-plus">+</span>
+        <div class="hero-stat hero-stat-primary">
+          <span class="num">{total_su:,}</span>
+          <span class="label">Suicide Deaths</span>
+          <span class="sublabel">1999–2016</span>
+        </div>
       </div>
-      <div class="hero-stat">
-        <span class="num">{total_su:,}</span>
-        <span class="label">Suicide Deaths<br>1999–2016</span>
+      <div class="hero-narrative-row">
+        <div class="hero-stat">
+          <span class="num">+{national_rate_change:.0f}%</span>
+          <span class="label">Rise in deaths of despair rate</span>
+          <span class="sublabel">1999 → 2016</span>
+        </div>
+        <div class="hero-stat hero-stat-amber">
+          <span class="num">76B</span>
+          <span class="label">Opioid pills shipped</span>
+          <span class="sublabel">2006–2012</span>
+        </div>
+        <div class="hero-stat hero-stat-amber">
+          <span class="num">${purdue_total_revenue // 1000:.0f}B+</span>
+          <span class="label">Purdue Pharma revenue</span>
+          <span class="sublabel">1996–2016</span>
+        </div>
+        <div class="hero-stat hero-stat-blue">
+          <span class="num">${total_settlement:.0f}B</span>
+          <span class="label">Legal settlements</span>
+          <span class="sublabel">Paid by industry</span>
+        </div>
       </div>
-      <div class="hero-stat">
-        <span class="num amber">${purdue_total_revenue // 1000:.0f}B+</span>
-        <span class="label">Purdue Pharma Revenue<br>1996–2016</span>
-      </div>
-      <div class="hero-stat">
-        <span class="num blue">${total_settlement:.0f}B</span>
-        <span class="label">Legal Settlements<br>Paid by Industry</span>
+      <div class="hero-narrative-row hero-epicenter">
+        <div class="hero-stat hero-stat-epicenter">
+          <span class="num">{worst_state['state_abbr']}</span>
+          <span class="label">Worst-hit state in 2016</span>
+          <span class="callout-num">{int(worst_state['deaths_despair_rate'])} deaths per 100k</span>
+        </div>
       </div>
     </div>
 
-    <div class="callout-grid" style="max-width:700px;margin:0 auto 2rem;">
-      <div class="callout">
-        <span class="callout-num">+{national_rate_change:.0f}%</span>
-        <p>Rise in deaths of despair<br>rate from 1999 to 2016</p>
-      </div>
-      <div class="callout amber">
-        <span class="callout-num">76B</span>
-        <p>Opioid pills shipped<br>across the US (2006–2012)</p>
-      </div>
-      <div class="callout blue">
-        <span class="callout-num">{worst_state['state_abbr']}</span>
-        <p>{int(worst_state['deaths_despair_rate'])} deaths per 100k —<br>worst state in 2016</p>
+    <div class="hero-journey">
+      <p class="hero-journey-title">Your journey through the data</p>
+      <div class="hero-journey-steps">
+        <a href="#chapter-1" class="hero-step"><span class="hero-step-num">1</span> The Timeline</a>
+        <a href="#chapter-2" class="hero-step"><span class="hero-step-num">2</span> The Geography</a>
+        <a href="#chapter-3" class="hero-step"><span class="hero-step-num">3</span> The Prescription Machine</a>
+        <a href="#chapter-4" class="hero-step"><span class="hero-step-num">4</span> The Profits</a>
+        <a href="#chapter-5" class="hero-step"><span class="hero-step-num">5</span> The Economics</a>
+        <a href="#chapter-6" class="hero-step"><span class="hero-step-num">6</span> Timeline of Events</a>
       </div>
     </div>
-    <div class="scroll-hint">↓ scroll to explore ↓</div>
+
+    <a href="#chapter-1" class="hero-cta">Start the story →</a>
+
+    <div class="scroll-hint">↓ or scroll to explore ↓</div>
   </div>
 </section>
 
 <!-- ===== SECTION 1: The Three Waves ===== -->
-<section class="section">
+<section id="chapter-1" class="section">
   <div class="container">
     <div class="section-tag red">Chapter 1 — The Timeline</div>
     <h2>Three Waves of Death — One Root Cause</h2>
@@ -835,16 +1093,16 @@ HTML = f"""<!DOCTYPE html>
 </section>
 
 <!-- ===== SECTION 2: Animated Map ===== -->
-<section class="section">
+<section id="chapter-2" class="section">
   <div class="container">
     <div class="section-tag red">Chapter 2 — The Geography</div>
     <h2>Watch America's Crisis Spread — Year by Year</h2>
     <p class="lead">
-      Press play. Watch the red spread. This is <strong>seventeen years of preventable deaths</strong>
+      Use the dropdown to select a year. This is <strong>seventeen years of preventable deaths</strong>
       mapped state by state. It doesn't spread randomly — it follows the geography of abandoned communities:
       the Rust Belt, Appalachia, rural America. The places where factories closed and nothing replaced them.
     </p>
-    <div class="chart-card" style="padding: 1rem;">
+    <div class="chart-card" style="padding: 1rem; min-height: 560px;">
       {chart_map}
       <div class="chart-source">Source: CDC NCHS Drug Poisoning Mortality by State (age-adjusted rate per 100,000), datasets jx6g-fdh6 and xbxb-epbu</div>
     </div>
@@ -852,7 +1110,7 @@ HTML = f"""<!DOCTYPE html>
 </section>
 
 <!-- ===== SECTION 3: The Prescription Machine ===== -->
-<section class="section">
+<section id="chapter-3" class="section">
   <div class="container">
     <div class="section-tag amber">Chapter 3 — The Machine</div>
     <h2>Prescriptions Written, Deaths That Followed</h2>
@@ -891,7 +1149,7 @@ HTML = f"""<!DOCTYPE html>
 </section>
 
 <!-- ===== SECTION 4: The Money ===== -->
-<section class="section">
+<section id="chapter-4" class="section">
   <div class="container">
     <div class="section-tag amber">Chapter 4 — The Profits</div>
     <h2>An $11 Billion Industry Built on Addiction</h2>
@@ -928,18 +1186,18 @@ HTML = f"""<!DOCTYPE html>
 </section>
 
 <!-- ===== SECTION 5: The Economic Connection ===== -->
-<section class="section">
+<section id="chapter-5" class="section">
   <div class="container">
     <div class="section-tag blue">Chapter 5 — The Economics</div>
     <h2>Where the Jobs Went, Death Followed</h2>
     <p class="lead">
-      The opioid crisis didn't target randomly. It hit hardest in places where <strong>factories had closed,
+      <strong>Deaths of despair</strong> (overdoses + suicides) rise together where economic hope vanishes.
+      The opioid crisis didn't target randomly — it hit hardest where <strong>factories had closed,
       wages had stagnated, and communities had lost their identity</strong>. Pharma companies
-      specifically targeted these areas — identifying high-prescribing doctors in economically depressed regions
-      and flooding them with sales reps. The correlation between manufacturing job loss and deaths of despair
-      is not an accident. It's a target.
+      targeted these areas, flooding high-prescribing doctors in depressed regions with sales reps.
+      The correlation between manufacturing job loss and deaths of despair is not an accident.
     </p>
-    <div class="chart-card">
+    <div class="chart-card" style="min-height: 510px;">
       {chart_mfg}
       <div class="chart-source">Sources: CDC NCHS (death rates); FRED/BLS state manufacturing employment; dot size represents state population</div>
     </div>
@@ -951,7 +1209,7 @@ HTML = f"""<!DOCTYPE html>
 </section>
 
 <!-- ===== SECTION 6: Timeline ===== -->
-<section class="section">
+<section id="chapter-6" class="section">
   <div class="container">
     <div class="section-tag red">Chapter 6 — Timeline</div>
     <h2>How We Got Here</h2>
@@ -997,8 +1255,19 @@ HTML = f"""<!DOCTYPE html>
   <p style="margin-top:.5rem;">All data is from public sources. Pharma revenue figures are from court documents, DOJ settlements, and peer-reviewed studies. See methodology above.</p>
 </footer>
 
+
 </body>
 </html>"""
+
+# ---------------------------------------------------------------------------
+# Inject embedded Plotly.js (escape </script> to avoid breaking HTML)
+# ---------------------------------------------------------------------------
+plotly_js = get_plotlyjs().replace("</script>", "</scr" + "ipt>")
+script_tag = f'<script charset="utf-8">{plotly_js}</script>'
+HTML = HTML.replace(
+    '<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@3.4.0/plotly.min.js" charset="utf-8"></script>',
+    script_tag,
+)
 
 # ---------------------------------------------------------------------------
 # Write output
