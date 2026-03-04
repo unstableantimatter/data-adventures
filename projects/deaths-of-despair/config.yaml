@@ -1,0 +1,139 @@
+# Project configuration — Deaths of Despair: The Quiet Epidemic
+
+name: deaths-of-despair
+title: "Deaths of Despair: The Quiet Epidemic Killing Working-Class America"
+status: phase_1_find
+
+narrative_hypothesis: >
+  The collapse of manufacturing in American communities was not just an
+  economic event — it was a death sentence. When factories closed, the
+  social fabric that kept communities together unraveled: steady wages,
+  purpose, and identity disappeared. What replaced them was a wave of
+  drug overdoses, suicides, and alcohol deaths that spread across the
+  Rust Belt and rural America like a slow-motion disaster. This story
+  tracks that collapse — and names it.
+
+indicators:
+  # --- Deaths of Despair ---
+  - name: overdose_death_rate
+    category: health
+    source: cdc_nchs_overdose
+    time_range: "1999-2021"
+    geo_level: state
+    direction_of_good: lower
+    tags: [opioids, fentanyl, drugs, mortality, despair]
+
+  - name: suicide_rate
+    category: health
+    source: cdc_nchs_causes
+    time_range: "1999-2020"
+    geo_level: state
+    direction_of_good: lower
+    tags: [suicide, mental_health, mortality, despair]
+
+  - name: deaths_despair_rate
+    category: health
+    source: derived
+    time_range: "1999-2020"
+    geo_level: state
+    direction_of_good: lower
+    tags: [despair, composite, mortality]
+
+  # --- Economic drivers ---
+  - name: manufacturing_employment_thousands
+    category: economic
+    source: fred_bls
+    time_range: "1990-2023"
+    geo_level: state
+    direction_of_good: higher
+    tags: [manufacturing, jobs, deindustrialization]
+
+  - name: unemployment_rate
+    category: economic
+    source: fred_bls
+    time_range: "1990-2023"
+    geo_level: state
+    direction_of_good: lower
+    tags: [unemployment, labor, economic_hardship]
+
+  - name: median_household_income
+    category: economic
+    source: census_acs
+    time_range: "2005-2023"
+    geo_level: state
+    direction_of_good: higher
+    tags: [income, wealth, middle_class]
+
+  - name: poverty_pct
+    category: economic
+    source: census_acs
+    time_range: "2005-2023"
+    geo_level: state
+    direction_of_good: lower
+    tags: [poverty, economic_hardship]
+
+hypotheses:
+  - name: "Deindustrialization precedes deaths of despair with a lag"
+    pattern: lag_lead
+    predictor_variable: manufacturing_employment_thousands
+    outcome_variable: deaths_despair_rate
+    expected: >
+      States and time periods with the steepest manufacturing employment
+      declines show elevated deaths of despair 5-10 years later. The
+      collapse of economic identity precedes the collapse of physical health.
+    indicators: [manufacturing_employment_thousands, deaths_despair_rate]
+
+  - name: "Geographic clustering in Rust Belt and Appalachia"
+    pattern: segmentation
+    segment_variable: region
+    outcome_variable: deaths_despair_rate
+    expected: >
+      Deaths of despair are disproportionately concentrated in former
+      manufacturing states (Ohio, Pennsylvania, West Virginia, Kentucky,
+      Michigan) and rural Appalachia versus coastal metro economies.
+    indicators: [deaths_despair_rate, manufacturing_employment_thousands]
+
+  - name: "The opioid-to-fentanyl wave acceleration"
+    pattern: threshold
+    predictor_variable: year
+    outcome_variable: overdose_death_rate
+    expected: >
+      Overdose death rates show a structural break around 2013-2016 as
+      heroin and synthetic opioids (fentanyl) replaced prescription pills,
+      causing an exponential rather than linear increase in deaths.
+    indicators: [overdose_death_rate]
+
+  - name: "Income stagnation drives despair independent of unemployment"
+    pattern: divergence
+    predictor_variable: median_household_income
+    outcome_variable: deaths_despair_rate
+    expected: >
+      Even in states with recovering unemployment rates, deaths of despair
+      remain elevated in communities where real wages never recovered,
+      suggesting stagnant income — not just joblessness — drives despair.
+    indicators: [median_household_income, unemployment_rate, deaths_despair_rate]
+
+data_sources:
+  - name: cdc_nchs_overdose
+    url: https://data.cdc.gov/resource/juty-9by7.json
+    format: json_api
+    license: public_domain
+    notes: "NCHS Drug Poisoning Mortality by State, 1999-2021. Age-adjusted death rates per 100k. Socrata API."
+
+  - name: cdc_nchs_causes
+    url: https://data.cdc.gov/resource/bi63-dtpu.json
+    format: json_api
+    license: public_domain
+    notes: "NCHS Leading Causes of Death, United States. 1999-2020. Includes Suicide cause. Socrata API."
+
+  - name: fred_bls
+    url: https://fred.stlouisfed.org/graph/fredgraph.csv
+    format: csv
+    license: public_domain
+    notes: "FRED: State manufacturing employment ({abbr}MFG) and unemployment rates ({abbr}UR). Monthly, annual average computed."
+
+  - name: census_acs
+    url: https://api.census.gov/data/
+    format: json_api
+    license: public_domain
+    notes: "ACS 1-year estimates 2005-2023. Median household income (B19013_001E) and poverty (B17001_001E/002E) by state."

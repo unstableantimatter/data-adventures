@@ -46,6 +46,27 @@ Research projects to run through the pipeline.
 | ID | Project | Status | Directory |
 |----|---------|--------|-----------|
 | S-1 | Quality of Life in the USA vs. Immigration Trends | Phase 5 (Execute & share) | `projects/qol-immigration/` |
+| S-2 | Deaths of Despair: The Quiet Epidemic Killing Working-Class America | Phase 5 (Execute & share) | `projects/deaths-of-despair/` |
+
+### S-2: Deaths of Despair: The Quiet Epidemic
+
+**Narrative:** The collapse of manufacturing in American communities wasn't just
+an economic event — it was a death sentence. When factories closed, the social
+fabric unraveled: wages, purpose, and identity disappeared. What replaced them
+was a wave of drug overdoses and suicides that spread across the Rust Belt and
+rural America. This study tracks that collapse and names it.
+
+**Data:** CDC NCHS drug overdose deaths by state (1999–2016, age-adjusted per 100k),
+CDC NCHS suicide deaths by state, FRED state manufacturing employment, Census ACS
+income and poverty by state.
+
+**Key visualizations:**
+- Animated US choropleth: deaths of despair spreading state by state (1999→2016)
+- The three opioid waves: Rx → heroin → fentanyl timeline
+- Manufacturing job loss vs. deaths of despair scatter animation
+- Two Americas: states that kept vs. lost manufacturing
+
+---
 
 ### S-1: Quality of Life in the USA vs. Immigration Trends
 
@@ -70,4 +91,4 @@ Items gated on prerequisites or deferred by design.
 
 ---
 
-*Last updated: 2026-03-04*
+*Last updated: 2026-03-04 (S-2 Deaths of Despair added)*

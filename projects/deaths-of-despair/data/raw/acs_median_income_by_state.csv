@@ -1,0 +1,937 @@
+year,state_fips,state_name,median_household_income
+2005,01,Alabama,36879
+2005,02,Alaska,56234
+2005,04,Arizona,44282
+2005,05,Arkansas,34999
+2005,06,California,53629
+2005,08,Colorado,50652
+2005,09,Connecticut,60941
+2005,10,Delaware,52499
+2005,11,District of Columbia,47221
+2005,12,Florida,42433
+2005,13,Georgia,45604
+2005,15,Hawaii,58112
+2005,16,Idaho,41443
+2005,17,Illinois,50260
+2005,18,Indiana,43993
+2005,19,Iowa,43609
+2005,20,Kansas,42920
+2005,21,Kentucky,37369
+2005,22,Louisiana,36729
+2005,23,Maine,42801
+2005,24,Maryland,61592
+2005,25,Massachusetts,57184
+2005,26,Michigan,46039
+2005,27,Minnesota,52024
+2005,28,Mississippi,32938
+2005,29,Missouri,41974
+2005,30,Montana,39301
+2005,31,Nebraska,43849
+2005,32,Nevada,49169
+2005,33,New Hampshire,56768
+2005,34,New Jersey,61672
+2005,35,New Mexico,37492
+2005,36,New York,49480
+2005,37,North Carolina,40729
+2005,38,North Dakota,41030
+2005,39,Ohio,43493
+2005,40,Oklahoma,37063
+2005,41,Oregon,42944
+2005,42,Pennsylvania,44537
+2005,44,Rhode Island,51458
+2005,45,South Carolina,39316
+2005,46,South Dakota,40310
+2005,47,Tennessee,38874
+2005,48,Texas,42139
+2005,49,Utah,47934
+2005,50,Vermont,45686
+2005,51,Virginia,54240
+2005,53,Washington,49262
+2005,54,West Virginia,33452
+2005,55,Wisconsin,47105
+2005,56,Wyoming,46202
+2005,72,Puerto Rico,17184
+2006,01,Alabama,38783
+2006,02,Alaska,59393
+2006,04,Arizona,47265
+2006,05,Arkansas,36599
+2006,06,California,56645
+2006,08,Colorado,52015
+2006,09,Connecticut,63422
+2006,10,Delaware,52833
+2006,11,District of Columbia,51847
+2006,12,Florida,45495
+2006,13,Georgia,46832
+2006,15,Hawaii,61160
+2006,16,Idaho,42865
+2006,17,Illinois,52006
+2006,18,Indiana,45394
+2006,19,Iowa,44491
+2006,20,Kansas,45478
+2006,21,Kentucky,39372
+2006,22,Louisiana,39337
+2006,23,Maine,43439
+2006,24,Maryland,65144
+2006,25,Massachusetts,59963
+2006,26,Michigan,47182
+2006,27,Minnesota,54023
+2006,28,Mississippi,34473
+2006,29,Missouri,42841
+2006,30,Montana,40627
+2006,31,Nebraska,45474
+2006,32,Nevada,52998
+2006,33,New Hampshire,59683
+2006,34,New Jersey,64470
+2006,35,New Mexico,40629
+2006,36,New York,51384
+2006,37,North Carolina,42625
+2006,38,North Dakota,41919
+2006,39,Ohio,44532
+2006,40,Oklahoma,38770
+2006,41,Oregon,46230
+2006,42,Pennsylvania,46259
+2006,44,Rhode Island,51814
+2006,45,South Carolina,41100
+2006,46,South Dakota,42791
+2006,47,Tennessee,40315
+2006,48,Texas,44922
+2006,49,Utah,51309
+2006,50,Vermont,47665
+2006,51,Virginia,56277
+2006,53,Washington,52583
+2006,54,West Virginia,35059
+2006,55,Wisconsin,48772
+2006,56,Wyoming,47423
+2006,72,Puerto Rico,17621
+2007,01,Alabama,40554
+2007,02,Alaska,64333
+2007,04,Arizona,49889
+2007,05,Arkansas,38134
+2007,06,California,59948
+2007,08,Colorado,55212
+2007,09,Connecticut,65967
+2007,10,Delaware,54610
+2007,11,District of Columbia,54317
+2007,12,Florida,47804
+2007,13,Georgia,49136
+2007,18,Indiana,47448
+2007,15,Hawaii,63746
+2007,16,Idaho,46253
+2007,17,Illinois,54124
+2007,19,Iowa,47292
+2007,20,Kansas,47451
+2007,21,Kentucky,40267
+2007,22,Louisiana,40926
+2007,23,Maine,45888
+2007,24,Maryland,68080
+2007,25,Massachusetts,62365
+2007,26,Michigan,47950
+2007,27,Minnesota,55802
+2007,28,Mississippi,36338
+2007,29,Missouri,45114
+2007,30,Montana,43531
+2007,31,Nebraska,47085
+2007,32,Nevada,55062
+2007,33,New Hampshire,62369
+2007,34,New Jersey,67035
+2007,35,New Mexico,41452
+2007,36,New York,53514
+2007,37,North Carolina,44670
+2007,38,North Dakota,43753
+2007,39,Ohio,46597
+2007,40,Oklahoma,41567
+2007,41,Oregon,48730
+2007,42,Pennsylvania,48576
+2007,44,Rhode Island,53568
+2007,45,South Carolina,43329
+2007,46,South Dakota,43424
+2007,47,Tennessee,42367
+2007,48,Texas,47548
+2007,49,Utah,55109
+2007,50,Vermont,49907
+2007,51,Virginia,59562
+2007,53,Washington,55591
+2007,54,West Virginia,37060
+2007,55,Wisconsin,50578
+2007,56,Wyoming,51731
+2007,72,Puerto Rico,17741
+2008,01,Alabama,42666
+2008,02,Alaska,68460
+2008,04,Arizona,50958
+2008,05,Arkansas,38815
+2008,06,California,61021
+2008,08,Colorado,56993
+2008,09,Connecticut,68595
+2008,10,Delaware,57989
+2008,11,District of Columbia,57936
+2008,12,Florida,47778
+2008,13,Georgia,50861
+2008,15,Hawaii,67214
+2008,16,Idaho,47576
+2008,20,Kansas,50177
+2008,17,Illinois,56235
+2008,18,Indiana,47966
+2008,19,Iowa,48980
+2008,21,Kentucky,41538
+2008,22,Louisiana,43733
+2008,23,Maine,46581
+2008,24,Maryland,70545
+2008,25,Massachusetts,65401
+2008,26,Michigan,48591
+2008,27,Minnesota,57288
+2008,28,Mississippi,37790
+2008,29,Missouri,46867
+2008,30,Montana,43654
+2008,31,Nebraska,49693
+2008,32,Nevada,56361
+2008,33,New Hampshire,63731
+2008,34,New Jersey,70378
+2008,35,New Mexico,43508
+2008,36,New York,56033
+2008,37,North Carolina,46549
+2008,38,North Dakota,45685
+2008,39,Ohio,47988
+2008,40,Oklahoma,42822
+2008,41,Oregon,50169
+2008,42,Pennsylvania,50713
+2008,44,Rhode Island,55701
+2008,45,South Carolina,44625
+2008,46,South Dakota,46032
+2008,47,Tennessee,43614
+2008,48,Texas,50043
+2008,49,Utah,56633
+2008,50,Vermont,52104
+2008,51,Virginia,61233
+2008,53,Washington,58078
+2008,54,West Virginia,37989
+2008,55,Wisconsin,52094
+2008,56,Wyoming,53207
+2008,72,Puerto Rico,18401
+2009,01,Alabama,40489
+2009,02,Alaska,66953
+2009,04,Arizona,48745
+2009,05,Arkansas,37823
+2009,06,California,58931
+2009,08,Colorado,55430
+2009,09,Connecticut,67034
+2009,10,Delaware,56860
+2009,11,District of Columbia,59290
+2009,12,Florida,44736
+2009,13,Georgia,47590
+2009,15,Hawaii,64098
+2009,16,Idaho,44926
+2009,20,Kansas,47817
+2009,17,Illinois,53966
+2009,18,Indiana,45424
+2009,19,Iowa,48044
+2009,21,Kentucky,40072
+2009,22,Louisiana,42492
+2009,23,Maine,45734
+2009,24,Maryland,69272
+2009,25,Massachusetts,64081
+2009,26,Michigan,45255
+2009,27,Minnesota,55616
+2009,28,Mississippi,36646
+2009,29,Missouri,45229
+2009,30,Montana,42322
+2009,31,Nebraska,47357
+2009,32,Nevada,53341
+2009,33,New Hampshire,60567
+2009,34,New Jersey,68342
+2009,35,New Mexico,43028
+2009,36,New York,54659
+2009,37,North Carolina,43674
+2009,38,North Dakota,47827
+2009,39,Ohio,45395
+2009,40,Oklahoma,41664
+2009,41,Oregon,48457
+2009,42,Pennsylvania,49520
+2009,44,Rhode Island,54119
+2009,45,South Carolina,42442
+2009,46,South Dakota,45043
+2009,47,Tennessee,41725
+2009,48,Texas,48259
+2009,49,Utah,55117
+2009,50,Vermont,51618
+2009,51,Virginia,59330
+2009,53,Washington,56548
+2009,54,West Virginia,37435
+2009,55,Wisconsin,49993
+2009,56,Wyoming,52664
+2009,72,Puerto Rico,18314
+2010,01,Alabama,40474
+2010,02,Alaska,64576
+2010,04,Arizona,46789
+2010,05,Arkansas,38307
+2010,06,California,57708
+2010,08,Colorado,54046
+2010,09,Connecticut,64032
+2010,10,Delaware,55847
+2010,11,District of Columbia,60903
+2010,12,Florida,44409
+2010,13,Georgia,46430
+2010,15,Hawaii,63030
+2010,16,Idaho,43490
+2010,17,Illinois,52972
+2010,18,Indiana,44613
+2010,19,Iowa,47961
+2010,20,Kansas,48257
+2010,21,Kentucky,40062
+2010,22,Louisiana,42505
+2010,23,Maine,45815
+2010,24,Maryland,68854
+2010,25,Massachusetts,62072
+2010,26,Michigan,45413
+2010,27,Minnesota,55459
+2010,28,Mississippi,36851
+2010,29,Missouri,44301
+2010,30,Montana,42666
+2010,31,Nebraska,48408
+2010,32,Nevada,51001
+2010,33,New Hampshire,61042
+2010,34,New Jersey,67681
+2010,35,New Mexico,42090
+2010,36,New York,54148
+2010,37,North Carolina,43326
+2010,38,North Dakota,48670
+2010,39,Ohio,45090
+2010,40,Oklahoma,42072
+2010,41,Oregon,46560
+2010,42,Pennsylvania,49288
+2010,44,Rhode Island,52254
+2010,45,South Carolina,42018
+2010,46,South Dakota,45904
+2010,47,Tennessee,41461
+2010,48,Texas,48615
+2010,49,Utah,54744
+2010,50,Vermont,49406
+2010,51,Virginia,60674
+2010,53,Washington,55631
+2010,54,West Virginia,38218
+2010,55,Wisconsin,49001
+2010,56,Wyoming,53512
+2010,72,Puerto Rico,18862
+2011,01,Alabama,41415
+2011,02,Alaska,67825
+2011,04,Arizona,46709
+2011,05,Arkansas,38758
+2011,06,California,57287
+2011,08,Colorado,55387
+2011,09,Connecticut,65753
+2011,10,Delaware,58814
+2011,11,District of Columbia,63124
+2011,12,Florida,44299
+2011,13,Georgia,46007
+2011,15,Hawaii,61821
+2011,16,Idaho,43341
+2011,17,Illinois,53234
+2011,18,Indiana,46438
+2011,19,Iowa,49427
+2011,20,Kansas,48964
+2011,21,Kentucky,41141
+2011,22,Louisiana,41734
+2011,23,Maine,46033
+2011,24,Maryland,70004
+2011,25,Massachusetts,62859
+2011,26,Michigan,45981
+2011,27,Minnesota,56954
+2011,28,Mississippi,36919
+2011,29,Missouri,45247
+2011,30,Montana,44222
+2011,31,Nebraska,50296
+2011,32,Nevada,48927
+2011,33,New Hampshire,62647
+2011,34,New Jersey,67458
+2011,35,New Mexico,41963
+2011,36,New York,55246
+2011,37,North Carolina,43916
+2011,38,North Dakota,51704
+2011,39,Ohio,45749
+2011,40,Oklahoma,43225
+2011,41,Oregon,46816
+2011,42,Pennsylvania,50228
+2011,44,Rhode Island,53636
+2011,45,South Carolina,42367
+2011,46,South Dakota,48321
+2011,47,Tennessee,41693
+2011,48,Texas,49392
+2011,49,Utah,55869
+2011,50,Vermont,52776
+2011,51,Virginia,61882
+2011,53,Washington,56835
+2011,54,West Virginia,38482
+2011,55,Wisconsin,50395
+2011,56,Wyoming,56322
+2011,72,Puerto Rico,18660
+2012,01,Alabama,41574
+2012,02,Alaska,67712
+2012,04,Arizona,47826
+2012,05,Arkansas,40112
+2012,06,California,58328
+2012,08,Colorado,56765
+2012,10,Delaware,58415
+2012,11,District of Columbia,66583
+2012,09,Connecticut,67276
+2012,12,Florida,45040
+2012,13,Georgia,47209
+2012,16,Idaho,45489
+2012,15,Hawaii,66259
+2012,17,Illinois,55137
+2012,18,Indiana,46974
+2012,19,Iowa,50957
+2012,20,Kansas,50241
+2012,21,Kentucky,41724
+2012,22,Louisiana,42944
+2012,23,Maine,46709
+2012,24,Maryland,71122
+2012,25,Massachusetts,65339
+2012,26,Michigan,46859
+2012,27,Minnesota,58906
+2012,28,Mississippi,37095
+2012,29,Missouri,45321
+2012,30,Montana,45076
+2012,31,Nebraska,50723
+2012,32,Nevada,49760
+2012,33,New Hampshire,63280
+2012,34,New Jersey,69667
+2012,35,New Mexico,42558
+2012,36,New York,56448
+2012,37,North Carolina,45150
+2012,38,North Dakota,53585
+2012,39,Ohio,46829
+2012,40,Oklahoma,44312
+2012,41,Oregon,49161
+2012,42,Pennsylvania,51230
+2012,44,Rhode Island,54554
+2012,45,South Carolina,43107
+2012,46,South Dakota,48362
+2012,47,Tennessee,42764
+2012,48,Texas,50740
+2012,50,Vermont,52977
+2012,49,Utah,57049
+2012,51,Virginia,61741
+2012,53,Washington,57573
+2012,54,West Virginia,40196
+2012,55,Wisconsin,51059
+2012,56,Wyoming,54901
+2012,72,Puerto Rico,19429
+2013,28,Mississippi,37963
+2013,29,Missouri,46931
+2013,30,Montana,46972
+2013,31,Nebraska,51440
+2013,32,Nevada,51230
+2013,33,New Hampshire,64230
+2013,34,New Jersey,70165
+2013,35,New Mexico,43872
+2013,36,New York,57369
+2013,37,North Carolina,45906
+2013,38,North Dakota,55759
+2013,39,Ohio,48081
+2013,40,Oklahoma,45690
+2013,41,Oregon,50251
+2013,42,Pennsylvania,52007
+2013,44,Rhode Island,55902
+2013,45,South Carolina,44163
+2013,46,South Dakota,48947
+2013,47,Tennessee,44297
+2013,48,Texas,51704
+2013,50,Vermont,52578
+2013,49,Utah,59770
+2013,51,Virginia,62666
+2013,53,Washington,58405
+2013,54,West Virginia,41253
+2013,55,Wisconsin,51467
+2013,56,Wyoming,58752
+2013,72,Puerto Rico,19183
+2013,01,Alabama,42849
+2013,02,Alaska,72237
+2013,04,Arizona,48510
+2013,05,Arkansas,40511
+2013,06,California,60190
+2013,08,Colorado,58823
+2013,10,Delaware,57846
+2013,11,District of Columbia,67572
+2013,09,Connecticut,67098
+2013,12,Florida,46036
+2013,13,Georgia,47829
+2013,16,Idaho,46783
+2013,15,Hawaii,68020
+2013,17,Illinois,56210
+2013,18,Indiana,47529
+2013,19,Iowa,52229
+2013,20,Kansas,50972
+2013,21,Kentucky,43399
+2013,22,Louisiana,44164
+2013,23,Maine,46974
+2013,24,Maryland,72483
+2013,25,Massachusetts,66768
+2013,26,Michigan,48273
+2013,27,Minnesota,60702
+2014,01,Alabama,42830
+2014,02,Alaska,71583
+2014,04,Arizona,50068
+2014,05,Arkansas,41262
+2014,06,California,61933
+2014,08,Colorado,61303
+2014,10,Delaware,59716
+2014,11,District of Columbia,71648
+2014,09,Connecticut,70048
+2014,12,Florida,47463
+2014,13,Georgia,49321
+2014,16,Idaho,47861
+2014,15,Hawaii,69592
+2014,17,Illinois,57444
+2014,18,Indiana,49446
+2014,19,Iowa,53712
+2014,20,Kansas,52504
+2014,21,Kentucky,42958
+2014,22,Louisiana,44555
+2014,23,Maine,49462
+2014,24,Maryland,73971
+2014,25,Massachusetts,69160
+2014,26,Michigan,49847
+2014,27,Minnesota,61481
+2014,28,Mississippi,39680
+2014,29,Missouri,48363
+2014,30,Montana,46328
+2014,31,Nebraska,52686
+2014,32,Nevada,51450
+2014,33,New Hampshire,66532
+2014,34,New Jersey,71919
+2014,35,New Mexico,44803
+2014,36,New York,58878
+2014,37,North Carolina,46556
+2014,38,North Dakota,59029
+2014,39,Ohio,49308
+2014,40,Oklahoma,47529
+2014,41,Oregon,51075
+2014,42,Pennsylvania,53234
+2014,44,Rhode Island,54891
+2014,45,South Carolina,45238
+2014,46,South Dakota,50979
+2014,47,Tennessee,44361
+2014,48,Texas,53035
+2014,50,Vermont,54166
+2014,49,Utah,60922
+2014,51,Virginia,64902
+2014,53,Washington,61366
+2014,54,West Virginia,41059
+2014,55,Wisconsin,52622
+2014,56,Wyoming,57055
+2014,72,Puerto Rico,18928
+2015,28,Mississippi,40593
+2015,29,Missouri,50238
+2015,30,Montana,49509
+2015,31,Nebraska,54996
+2015,32,Nevada,52431
+2015,33,New Hampshire,70303
+2015,34,New Jersey,72222
+2015,35,New Mexico,45382
+2015,36,New York,60850
+2015,37,North Carolina,47830
+2015,38,North Dakota,60557
+2015,39,Ohio,51075
+2015,40,Oklahoma,48568
+2015,41,Oregon,54148
+2015,42,Pennsylvania,55702
+2015,44,Rhode Island,58073
+2015,45,South Carolina,47238
+2015,46,South Dakota,53017
+2015,47,Tennessee,47275
+2015,48,Texas,55653
+2015,50,Vermont,56990
+2015,49,Utah,62912
+2015,51,Virginia,66262
+2015,53,Washington,64129
+2015,54,West Virginia,42019
+2015,55,Wisconsin,55638
+2015,56,Wyoming,60214
+2015,72,Puerto Rico,18626
+2015,01,Alabama,44765
+2015,02,Alaska,73355
+2015,04,Arizona,51492
+2015,05,Arkansas,41995
+2015,06,California,64500
+2015,08,Colorado,63909
+2015,10,Delaware,61255
+2015,11,District of Columbia,75628
+2015,09,Connecticut,71346
+2015,12,Florida,49426
+2015,13,Georgia,51244
+2015,16,Idaho,48275
+2015,15,Hawaii,73486
+2015,17,Illinois,59588
+2015,18,Indiana,50532
+2015,19,Iowa,54736
+2015,20,Kansas,53906
+2015,21,Kentucky,45215
+2015,22,Louisiana,45727
+2015,23,Maine,51494
+2015,24,Maryland,75847
+2015,25,Massachusetts,70628
+2015,26,Michigan,51084
+2015,27,Minnesota,63488
+2016,28,Mississippi,41754
+2016,29,Missouri,51746
+2016,30,Montana,50027
+2016,31,Nebraska,56927
+2016,32,Nevada,55180
+2016,33,New Hampshire,70936
+2016,34,New Jersey,76126
+2016,35,New Mexico,46748
+2016,36,New York,62909
+2016,37,North Carolina,50584
+2016,38,North Dakota,60656
+2016,39,Ohio,52334
+2016,40,Oklahoma,49176
+2016,41,Oregon,57532
+2016,42,Pennsylvania,56907
+2016,44,Rhode Island,60596
+2016,45,South Carolina,49501
+2016,46,South Dakota,54467
+2016,47,Tennessee,48547
+2016,48,Texas,56565
+2016,50,Vermont,57677
+2016,49,Utah,65977
+2016,51,Virginia,68114
+2016,53,Washington,67106
+2016,54,West Virginia,43385
+2016,55,Wisconsin,56811
+2016,56,Wyoming,59882
+2016,72,Puerto Rico,20078
+2016,01,Alabama,46257
+2016,02,Alaska,76440
+2016,04,Arizona,53558
+2016,05,Arkansas,44334
+2016,06,California,67739
+2016,08,Colorado,65685
+2016,10,Delaware,61757
+2016,13,Georgia,53559
+2016,11,District of Columbia,75506
+2016,09,Connecticut,73433
+2016,12,Florida,50860
+2016,16,Idaho,51807
+2016,15,Hawaii,74511
+2016,17,Illinois,60960
+2016,18,Indiana,52314
+2016,19,Iowa,56247
+2016,20,Kansas,54935
+2016,21,Kentucky,46659
+2016,22,Louisiana,45146
+2016,23,Maine,53079
+2016,24,Maryland,78945
+2016,25,Massachusetts,75297
+2016,26,Michigan,52492
+2016,27,Minnesota,65599
+2017,28,Mississippi,43529
+2017,29,Missouri,53578
+2017,30,Montana,53386
+2017,31,Nebraska,59970
+2017,32,Nevada,58003
+2017,33,New Hampshire,73381
+2017,34,New Jersey,80088
+2017,35,New Mexico,46744
+2017,36,New York,64894
+2017,37,North Carolina,52752
+2017,38,North Dakota,61843
+2017,39,Ohio,54021
+2017,40,Oklahoma,50051
+2017,41,Oregon,60212
+2017,42,Pennsylvania,59195
+2017,44,Rhode Island,63870
+2017,45,South Carolina,50570
+2017,46,South Dakota,56521
+2017,47,Tennessee,51340
+2017,48,Texas,59206
+2017,50,Vermont,57513
+2017,49,Utah,68358
+2017,51,Virginia,71535
+2017,53,Washington,70979
+2017,54,West Virginia,43469
+2017,55,Wisconsin,59305
+2017,56,Wyoming,60434
+2017,72,Puerto Rico,19343
+2017,02,Alaska,73181
+2017,01,Alabama,48123
+2017,04,Arizona,56581
+2017,05,Arkansas,45869
+2017,06,California,71805
+2017,08,Colorado,69117
+2017,10,Delaware,62852
+2017,11,District of Columbia,82372
+2017,09,Connecticut,74168
+2017,12,Florida,52594
+2017,13,Georgia,56183
+2017,16,Idaho,52225
+2017,15,Hawaii,77765
+2017,17,Illinois,62992
+2017,18,Indiana,54181
+2017,19,Iowa,58570
+2017,20,Kansas,56422
+2017,21,Kentucky,48375
+2017,22,Louisiana,46145
+2017,23,Maine,56277
+2017,24,Maryland,80776
+2017,25,Massachusetts,77385
+2017,26,Michigan,54909
+2017,27,Minnesota,68388
+2018,55,Wisconsin,60773
+2018,56,Wyoming,61584
+2018,72,Puerto Rico,20296
+2018,28,Mississippi,44717
+2018,29,Missouri,54478
+2018,30,Montana,55328
+2018,31,Nebraska,59566
+2018,32,Nevada,58646
+2018,33,New Hampshire,74991
+2018,34,New Jersey,81740
+2018,35,New Mexico,47169
+2018,36,New York,67844
+2018,37,North Carolina,53855
+2018,38,North Dakota,63837
+2018,39,Ohio,56111
+2018,40,Oklahoma,51924
+2018,41,Oregon,63426
+2018,42,Pennsylvania,60905
+2018,44,Rhode Island,64340
+2018,45,South Carolina,52306
+2018,46,South Dakota,56274
+2018,47,Tennessee,52375
+2018,48,Texas,60629
+2018,50,Vermont,60782
+2018,49,Utah,71414
+2018,51,Virginia,72577
+2018,53,Washington,74073
+2018,54,West Virginia,44097
+2018,01,Alabama,49861
+2018,02,Alaska,74346
+2018,04,Arizona,59246
+2018,05,Arkansas,47062
+2018,06,California,75277
+2018,08,Colorado,71953
+2018,10,Delaware,64805
+2018,11,District of Columbia,85203
+2018,09,Connecticut,76348
+2018,12,Florida,55462
+2018,13,Georgia,58756
+2018,16,Idaho,55583
+2018,15,Hawaii,80212
+2018,17,Illinois,65030
+2018,18,Indiana,55746
+2018,19,Iowa,59955
+2018,20,Kansas,58218
+2018,21,Kentucky,50247
+2018,22,Louisiana,47905
+2018,23,Maine,55602
+2018,24,Maryland,83242
+2018,25,Massachusetts,79835
+2018,26,Michigan,56697
+2018,27,Minnesota,70315
+2019,28,Mississippi,45792
+2019,29,Missouri,57409
+2019,30,Montana,57153
+2019,31,Nebraska,63229
+2019,32,Nevada,63276
+2019,33,New Hampshire,77933
+2019,37,North Carolina,57341
+2019,34,New Jersey,85751
+2019,35,New Mexico,51945
+2019,36,New York,72108
+2019,38,North Dakota,64577
+2019,39,Ohio,58642
+2019,40,Oklahoma,54449
+2019,41,Oregon,67058
+2019,42,Pennsylvania,63463
+2019,44,Rhode Island,71169
+2019,45,South Carolina,56227
+2019,46,South Dakota,59533
+2019,47,Tennessee,56071
+2019,48,Texas,64034
+2019,50,Vermont,63001
+2019,49,Utah,75780
+2019,51,Virginia,76456
+2019,53,Washington,78687
+2019,54,West Virginia,48850
+2019,55,Wisconsin,64168
+2019,56,Wyoming,65003
+2019,72,Puerto Rico,20474
+2019,17,Illinois,69187
+2019,13,Georgia,61980
+2019,16,Idaho,60999
+2019,15,Hawaii,83102
+2019,18,Indiana,57603
+2019,19,Iowa,61691
+2019,20,Kansas,62087
+2019,21,Kentucky,52295
+2019,22,Louisiana,51073
+2019,23,Maine,58924
+2019,24,Maryland,86738
+2019,25,Massachusetts,85843
+2019,26,Michigan,59584
+2019,27,Minnesota,74593
+2019,09,Connecticut,78833
+2019,12,Florida,59227
+2019,01,Alabama,51734
+2019,02,Alaska,75463
+2019,04,Arizona,62055
+2019,05,Arkansas,48952
+2019,06,California,80440
+2019,08,Colorado,77127
+2019,10,Delaware,70176
+2019,11,District of Columbia,92266
+2021,01,Alabama,53913
+2021,72,Puerto Rico,22237
+2021,04,Arizona,69056
+2021,05,Arkansas,52528
+2021,06,California,84907
+2021,08,Colorado,82254
+2021,09,Connecticut,83771
+2021,10,Delaware,71091
+2021,11,District of Columbia,90088
+2021,12,Florida,63062
+2021,13,Georgia,66559
+2021,15,Hawaii,84857
+2021,16,Idaho,66474
+2021,17,Illinois,72205
+2021,18,Indiana,62743
+2021,19,Iowa,65600
+2021,20,Kansas,64124
+2021,21,Kentucky,55573
+2021,22,Louisiana,52087
+2021,23,Maine,64767
+2021,24,Maryland,90203
+2021,25,Massachusetts,89645
+2021,26,Michigan,63498
+2021,27,Minnesota,77720
+2021,28,Mississippi,48716
+2021,29,Missouri,61847
+2021,30,Montana,63249
+2021,31,Nebraska,66817
+2021,32,Nevada,66274
+2021,33,New Hampshire,88465
+2021,34,New Jersey,89296
+2021,35,New Mexico,53992
+2021,36,New York,74314
+2021,37,North Carolina,61972
+2021,38,North Dakota,66519
+2021,39,Ohio,62262
+2021,40,Oklahoma,55826
+2021,41,Oregon,71562
+2021,42,Pennsylvania,68957
+2021,44,Rhode Island,74008
+2021,45,South Carolina,59318
+2021,46,South Dakota,66143
+2021,47,Tennessee,59695
+2021,48,Texas,66963
+2021,49,Utah,79449
+2021,50,Vermont,72431
+2021,51,Virginia,80963
+2021,53,Washington,84247
+2021,54,West Virginia,51248
+2021,55,Wisconsin,67125
+2021,56,Wyoming,65204
+2021,02,Alaska,77845
+2022,01,Alabama,59674
+2022,02,Alaska,88121
+2022,04,Arizona,74568
+2022,05,Arkansas,55432
+2022,06,California,91551
+2022,08,Colorado,89302
+2022,09,Connecticut,88429
+2022,10,Delaware,82174
+2022,11,District of Columbia,101027
+2022,12,Florida,69303
+2022,13,Georgia,72837
+2022,15,Hawaii,92458
+2022,16,Idaho,72785
+2022,17,Illinois,76708
+2022,18,Indiana,66785
+2022,19,Iowa,69588
+2022,20,Kansas,68925
+2022,21,Kentucky,59341
+2022,22,Louisiana,55416
+2022,23,Maine,69543
+2022,24,Maryland,94991
+2022,25,Massachusetts,94488
+2022,26,Michigan,66986
+2022,27,Minnesota,82338
+2022,28,Mississippi,52719
+2022,29,Missouri,64811
+2022,30,Montana,67631
+2022,31,Nebraska,69597
+2022,32,Nevada,72333
+2022,33,New Hampshire,89992
+2022,34,New Jersey,96346
+2022,35,New Mexico,59726
+2022,36,New York,79557
+2022,37,North Carolina,67481
+2022,38,North Dakota,71970
+2022,39,Ohio,65720
+2022,40,Oklahoma,59673
+2022,41,Oregon,75657
+2022,42,Pennsylvania,71798
+2022,44,Rhode Island,81854
+2022,45,South Carolina,64115
+2022,46,South Dakota,69728
+2022,47,Tennessee,65254
+2022,48,Texas,72284
+2022,49,Utah,89168
+2022,50,Vermont,73991
+2022,51,Virginia,85873
+2022,53,Washington,91306
+2022,54,West Virginia,54329
+2022,55,Wisconsin,70996
+2022,56,Wyoming,70042
+2022,72,Puerto Rico,24112
+2023,01,Alabama,62212
+2023,02,Alaska,86631
+2023,04,Arizona,77315
+2023,05,Arkansas,58700
+2023,06,California,95521
+2023,08,Colorado,92911
+2023,09,Connecticut,91665
+2023,10,Delaware,81361
+2023,11,District of Columbia,108210
+2023,12,Florida,73311
+2023,13,Georgia,74632
+2023,15,Hawaii,95322
+2023,16,Idaho,74942
+2023,17,Illinois,80306
+2023,18,Indiana,69477
+2023,19,Iowa,71433
+2023,20,Kansas,70333
+2023,21,Kentucky,61118
+2023,22,Louisiana,58229
+2023,23,Maine,73733
+2023,24,Maryland,98678
+2023,25,Massachusetts,99858
+2023,26,Michigan,69183
+2023,27,Minnesota,85086
+2023,28,Mississippi,54203
+2023,29,Missouri,68545
+2023,30,Montana,70804
+2023,31,Nebraska,74590
+2023,32,Nevada,76364
+2023,33,New Hampshire,96838
+2023,34,New Jersey,99781
+2023,35,New Mexico,62268
+2023,36,New York,82095
+2023,37,North Carolina,70804
+2023,38,North Dakota,76525
+2023,39,Ohio,67769
+2023,40,Oklahoma,62138
+2023,41,Oregon,80160
+2023,42,Pennsylvania,73824
+2023,44,Rhode Island,84972
+2023,45,South Carolina,67804
+2023,46,South Dakota,71810
+2023,47,Tennessee,67631
+2023,48,Texas,75780
+2023,49,Utah,93421
+2023,50,Vermont,81211
+2023,51,Virginia,89931
+2023,53,Washington,94605
+2023,54,West Virginia,55948
+2023,55,Wisconsin,74631
+2023,56,Wyoming,72415
+2023,72,Puerto Rico,25621
