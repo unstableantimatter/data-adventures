@@ -21,7 +21,7 @@ interactive Plotly charts, using LLM agents (via Cursor) at every phase.
 
 ```bash
 # Clone and set up
-git clone <repo-url>
+git clone git@github.com:unstableantimatter/data-adventures.git
 cd data-adventures
 python -m venv .venv
 source .venv/bin/activate
@@ -53,19 +53,71 @@ python run.py qol-immigration --stage export
    `projects/qol-immigration/config.yaml` for an example.
 3. Run the pipeline: `python run.py my-new-study`
 
+## Publishing dashboards
+
+Finished dashboards are published to [GitHub Pages](https://unstableantimatter.github.io/data-adventures/)
+via the `docs/` folder. A landing page auto-generates from each project's `config.yaml`.
+
+### Publish workflow
+
+```bash
+# 1. Generate (or regenerate) a project's dashboard
+python projects/generation-priced-out/generate_dashboard.py
+
+# 2. Collect all dashboards into docs/ and rebuild the landing page
+python pipeline/publish.py
+
+# 3. Commit and push
+git add -A && git commit -m "Publish updated dashboards" && git push
+```
+
+GitHub Pages serves from `docs/` on `main` — no CI/CD workflow needed.
+Each dashboard is available at `https://unstableantimatter.github.io/data-adventures/<project-slug>/`.
+
+### What `publish.py` does
+
+1. Scans `projects/*/reports/dashboard.html` for all projects that have a
+   generated dashboard
+2. Copies each into `docs/<project-slug>/index.html`
+3. Reads each project's `config.yaml` for title and narrative hypothesis
+4. Generates `docs/index.html` — a landing page with cards linking to every
+   published dashboard
+
+### Custom domain
+
+To use a custom domain instead of the `github.io` URL:
+
+1. Add a CNAME DNS record pointing to `unstableantimatter.github.io`
+2. Run: `gh api repos/unstableantimatter/data-adventures/pages -X PUT -f "cname=yourdomain.com"`
+3. Add a `docs/CNAME` file containing the bare domain (e.g. `yourdomain.com`)
+
+### Adding a new dashboard to the site
+
+No configuration needed. If a project has both `config.yaml` and
+`reports/dashboard.html`, `publish.py` will pick it up automatically.
+The landing page card text comes from `title` and `narrative_hypothesis`
+in `config.yaml`.
+
 ## Directory structure
 
 ```
 data-adventures/
-├── pipeline/           # Reusable pipeline code
-│   └── templates/      # Notebook templates
-├── projects/           # Research projects (isolated)
+├── pipeline/               # Reusable pipeline code
+│   ├── config.py           # Project config loader
+│   ├── publish.py          # Dashboard → docs/ publisher
+│   └── templates/          # Notebook & design templates
+├── projects/               # Research projects (isolated)
+│   ├── generation-priced-out/
+│   ├── deaths-of-despair/
 │   └── qol-immigration/
-├── docs/               # Pipeline documentation
-├── run.py              # Single entrypoint
-├── requirements.txt    # Python dependencies
-├── backlog.md          # Pipeline backlog + project queue
-└── README.md           # This file
+├── docs/                   # GitHub Pages site (auto-generated)
+│   ├── index.html          # Landing page
+│   ├── generation-priced-out/index.html
+│   └── deaths-of-despair/index.html
+├── run.py                  # Single entrypoint
+├── requirements.txt        # Python dependencies
+├── backlog.md              # Pipeline backlog + project queue
+└── README.md               # This file
 ```
 
 ## Documentation
@@ -84,6 +136,8 @@ data-adventures/
 
 ## Current projects
 
-| Project | Status | Directory |
-|---------|--------|-----------|
-| Quality of Life in the USA vs. Immigration Trends | Planned | `projects/qol-immigration/` |
+| Project | Status | Live Dashboard |
+|---------|--------|----------------|
+| Generation Priced Out | Published | [View](https://unstableantimatter.github.io/data-adventures/generation-priced-out/) |
+| Deaths of Despair | Published | [View](https://unstableantimatter.github.io/data-adventures/deaths-of-despair/) |
+| Quality of Life vs. Immigration | Planned | `projects/qol-immigration/` |
