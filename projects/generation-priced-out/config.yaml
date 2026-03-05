@@ -1,0 +1,212 @@
+# Project configuration — Generation Priced Out
+
+name: generation-priced-out
+title: "Generation Priced Out: How 30 Looks Nothing Like It Used To"
+status: phase_1_find
+
+narrative_hypothesis: >
+  A 30-year-old today lives a fundamentally different life than a 30-year-old
+  in 1983. Independent living, marriage, homeownership, and having children
+  have all collapsed for young adults over four decades. This is not a
+  lifestyle choice — it is an economic verdict. Meanwhile, several countries
+  around the world show the inverse pattern: rising fertility, growing
+  homeownership among the young, and expanding populations. By placing the
+  U.S. trajectory alongside these divergent nations, we reveal just how far
+  America has fallen behind on the basic milestones that once defined
+  adulthood.
+
+indicators:
+  # --- US 30-year-old milestones (age 25-34 or 30-34 bracket) ---
+  - name: pct_living_independently
+    category: household
+    source: census_cps_living
+    time_range: "1983-2023"
+    geo_level: national
+    direction_of_good: higher
+    tags: [living_arrangements, independence, household_formation]
+
+  - name: pct_married
+    category: household
+    source: census_cps_marital
+    time_range: "1983-2023"
+    geo_level: national
+    direction_of_good: null
+    tags: [marriage, family, household_formation]
+
+  - name: homeownership_rate
+    category: economic
+    source: census_hvs
+    time_range: "1982-2023"
+    geo_level: national
+    direction_of_good: higher
+    tags: [homeownership, housing, wealth, affordability]
+
+  - name: total_fertility_rate
+    category: demographic
+    source: world_bank_fred
+    time_range: "1960-2022"
+    geo_level: national
+    direction_of_good: null
+    tags: [fertility, population, birth_rate, demographics]
+
+  # --- International comparison ---
+  - name: intl_fertility_rate
+    category: demographic
+    source: world_bank_api
+    time_range: "1960-2022"
+    geo_level: country
+    direction_of_good: null
+    tags: [fertility, international, population]
+
+  - name: intl_gdp_per_capita_growth
+    category: economic
+    source: world_bank_api
+    time_range: "1960-2022"
+    geo_level: country
+    direction_of_good: higher
+    tags: [gdp, growth, international, prosperity]
+
+  - name: intl_population_growth
+    category: demographic
+    source: world_bank_api
+    time_range: "1960-2022"
+    geo_level: country
+    direction_of_good: null
+    tags: [population, growth, international]
+
+  # --- Housing economics + CPI ---
+  - name: median_home_price
+    category: economic
+    source: fred_housing
+    time_range: "1963-2023"
+    geo_level: national
+    direction_of_good: null
+    tags: [housing, price, affordability]
+
+  - name: median_household_income
+    category: economic
+    source: fred_housing
+    time_range: "1984-2023"
+    geo_level: national
+    direction_of_good: higher
+    tags: [income, wages, affordability]
+
+  - name: median_personal_income
+    category: economic
+    source: fred_housing
+    time_range: "1974-2023"
+    geo_level: national
+    direction_of_good: higher
+    tags: [income, individual, affordability]
+
+  - name: mortgage_rate_30yr
+    category: economic
+    source: fred_housing
+    time_range: "1971-2023"
+    geo_level: national
+    direction_of_good: lower
+    tags: [mortgage, interest_rate, housing]
+
+  - name: cpi_u
+    category: economic
+    source: fred_housing
+    time_range: "1947-2023"
+    geo_level: national
+    direction_of_good: null
+    tags: [inflation, cpi, cost_of_living]
+
+  - name: cpi_shelter
+    category: economic
+    source: fred_housing
+    time_range: "1947-2023"
+    geo_level: national
+    direction_of_good: null
+    tags: [inflation, cpi, housing, shelter]
+
+  - name: per_capita_income
+    category: economic
+    source: fred_housing
+    time_range: "1929-2023"
+    geo_level: national
+    direction_of_good: higher
+    tags: [income, per_capita, affordability]
+
+  - name: price_to_income_ratio
+    category: economic
+    source: derived
+    time_range: "1984-2023"
+    geo_level: national
+    direction_of_good: lower
+    tags: [affordability, housing, derived]
+
+hypotheses:
+  - name: "Young-adult milestones have collapsed since 1983"
+    pattern: threshold
+    predictor_variable: year
+    outcome_variable: pct_living_independently
+    expected: >
+      All four milestones (independent living, marriage, homeownership,
+      fertility) show sharp, sustained declines from 1983 to the present,
+      with the steepest drops concentrated in the post-2000 period.
+    indicators:
+      - pct_living_independently
+      - pct_married
+      - homeownership_rate
+      - total_fertility_rate
+
+  - name: "Countries with inverse trajectories exist and are identifiable"
+    pattern: divergence
+    predictor_variable: intl_gdp_per_capita_growth
+    outcome_variable: intl_fertility_rate
+    expected: >
+      A subset of countries — particularly Israel, Nordic nations, and
+      select developing economies — show rising or stable fertility
+      alongside strong GDP per capita growth, the opposite of the US
+      pattern where economic growth coincided with demographic decline.
+    indicators:
+      - intl_fertility_rate
+      - intl_gdp_per_capita_growth
+      - intl_population_growth
+
+data_sources:
+  - name: census_cps_living
+    url: https://www.census.gov/data/tables/time-series/demo/families/adults.html
+    format: excel
+    license: public_domain
+    notes: "Census CPS America's Families & Living Arrangements: Table AD-1. Young adults 18-34 living at home, 1960-present."
+
+  - name: census_cps_marital
+    url: https://www.census.gov/data/tables/time-series/demo/families/marital.html
+    format: excel
+    license: public_domain
+    notes: "Census CPS Marital Status: Table MS-2. Marital status by age and sex, 1950-present."
+
+  - name: census_hvs
+    url: https://www.census.gov/housing/hvs/data/histtabs.html
+    format: excel
+    license: public_domain
+    notes: "Census Housing Vacancy Survey: Table 14. Homeownership rates by age of householder, annual 1982-present."
+
+  - name: world_bank_fred
+    url: https://fred.stlouisfed.org/series/SPDYNTFRTINUSA
+    format: csv
+    license: public_domain
+    notes: "World Bank Total Fertility Rate for USA via FRED. Annual, 1960-2022."
+
+  - name: world_bank_api
+    url: https://api.worldbank.org/v2/country/all/indicator/
+    format: json_api
+    license: public_domain
+    notes: "World Bank API — SP.DYN.TFRT.IN (fertility), SP.POP.GROW (population growth), NY.GDP.PCAP.KD.ZG (GDP per capita growth). All countries, 1960-2022."
+
+  - name: fred_housing
+    url: https://fred.stlouisfed.org/
+    format: csv
+    license: public_domain
+    notes: "FRED: MSPUS (home price), MSPNHSUS (new home price), MEHOINUSA646N (nominal household income), MEPAINUSA646N (median personal income), A792RC0A052NBEA (per capita income), MORTGAGE30US (30yr rate), COMPSFLAM1FQ (sqft), MDSP (debt service), CPIAUCSL (CPI-U), CUSR0000SAH1 (CPI Shelter)."
+
+  - name: census_lot_size
+    url: https://www.census.gov/construction/chars/index.html
+    format: documented
+    license: public_domain
+    notes: "Median lot size from Census Survey of Construction / Federal Reserve Board FEDS Notes (2017)."

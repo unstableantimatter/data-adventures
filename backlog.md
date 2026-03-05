@@ -47,6 +47,7 @@ Research projects to run through the pipeline.
 |----|---------|--------|-----------|
 | S-1 | Quality of Life in the USA vs. Immigration Trends | Phase 5 (Execute & share) | `projects/qol-immigration/` |
 | S-2 | Deaths of Despair: The Quiet Epidemic Killing Working-Class America | Phase 5 (Execute & share) | `projects/deaths-of-despair/` |
+| S-3 | Generation Priced Out: How 30 Looks Nothing Like It Used To | Phase 5 (Execute & share) | `projects/generation-priced-out/` |
 
 ### S-2: Deaths of Despair: The Quiet Epidemic
 
