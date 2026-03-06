@@ -156,6 +156,13 @@ stats["hp_growth_x"] = _idx_row["home_price_idx"] / 100
 stats["cpi_shelter_growth_x"] = _idx_row["cpi_shelter_idx"] / 100
 stats["hh_income_growth_x"] = _idx_row["income_idx"] / 100
 
+# Mortgage rate context
+_rate_84_row = national[national["year"] == 1984].iloc[0]
+_rate_latest_row = national.dropna(subset=["mortgage_rate_30yr"]).iloc[-1]
+stats["rate_1984"] = _rate_84_row.get("mortgage_rate_30yr", float("nan"))
+stats["rate_now"] = _rate_latest_row["mortgage_rate_30yr"]
+stats["rate_now_yr"] = int(_rate_latest_row["year"])
+
 # Per-earner effective homeownership: household rate adjusted by earners-per-household
 national["earners_per_hh"] = (
     national["median_household_income"] / national["median_personal_income"]
@@ -522,6 +529,54 @@ def make_chart_homeownership_per_earner():
     return fig_to_div(fig, "chart_ho_earner")
 
 
+# --- Chart 7: International TFR comparison ---
+def make_chart_intl_tfr():
+    intl_path = processed_dir / "international_panel.parquet"
+    if not intl_path.exists():
+        return ""
+    intl = pd.read_parquet(intl_path)
+
+    peers = {
+        "USA": ("United States", C_ROSE, 2.5),
+        "GBR": ("United Kingdom", C_SKY, 1.5),
+        "FRA": ("France", C_EMERALD, 1.5),
+        "DEU": ("Germany", C_AMBER, 1.5),
+        "JPN": ("Japan", C_VIOLET, 1.5),
+        "KOR": ("South Korea", C_ZINC, 1.5),
+    }
+
+    fig = go.Figure()
+    for code, (name, color, width) in peers.items():
+        d = intl[(intl["country_code"] == code) & (intl["fertility_rate"].notna())].copy()
+        d = d.sort_values("year")
+        if d.empty:
+            continue
+        fig.add_trace(go.Scatter(
+            x=d["year"], y=d["fertility_rate"],
+            name=name, mode="lines",
+            line=dict(color=color, width=width),
+            hovertemplate=f"%{{x}}: %{{y:.2f}}<extra>{name}</extra>",
+        ))
+
+    fig.add_hline(y=2.1, line_dash="dash", line_color="rgba(255,255,255,0.15)",
+                  annotation_text="Replacement (2.1)",
+                  annotation_position="bottom right",
+                  annotation_font=dict(color=C_SLATE, size=10))
+
+    layout = dark(440, margin=_MARGIN_WITH_LEGEND)
+    layout["yaxis"] = dict(
+        title="Births per Woman", range=[0.5, 4.5],
+        gridcolor="rgba(255,255,255,0.06)",
+        tickfont=dict(color=C_SLATE, size=11),
+    )
+    fig.update_layout(
+        **layout,
+        title="Fertility Rates: US vs. Peer Nations (1960–Present)",
+        hovermode="x unified", legend=_LEGEND_H,
+    )
+    return fig_to_div(fig, "chart_intl_tfr")
+
+
 # ---------------------------------------------------------------------------
 # Generate all chart divs
 # ---------------------------------------------------------------------------
@@ -547,6 +602,8 @@ chart_tfr = _make_single_trend(
 print("  + 4 individual trends")
 chart_ho_earner = make_chart_homeownership_per_earner()
 print("  + Per-earner homeownership")
+chart_intl_tfr = make_chart_intl_tfr()
+print("  + International TFR comparison")
 
 
 # ---------------------------------------------------------------------------
@@ -781,6 +838,38 @@ HTML = f"""<!DOCTYPE html>
     }}
     .stat p{{ font-size:.85rem; color:var(--muted); line-height:1.65; }}
 
+    /* ---- CLOSING / FINAL STATEMENT ---- */
+    .closing{{
+      margin-top:3rem; padding:2.5rem 0 3rem;
+      border-top:1px solid var(--border);
+    }}
+    .closing .lead{{
+      font-size:1.05rem; color:var(--text); line-height:1.9; max-width:700px;
+      margin-bottom:2rem; font-weight:500;
+    }}
+    .closing .lead strong{{ font-weight:600; }}
+    .key-stats-inline{{
+      font-size:.95rem; color:var(--muted); line-height:2;
+      margin-bottom:2.5rem; max-width:680px;
+    }}
+    .key-stats-inline strong{{ color:var(--text); font-weight:600; }}
+    .questions-block{{
+      padding:2rem 2rem 2rem 2.2rem;
+      border-left:3px solid rgba(255,255,255,0.12);
+      background:rgba(255,255,255,0.02);
+      border-radius:0 8px 8px 0;
+      font-size:.92rem; color:var(--muted); line-height:1.9;
+    }}
+    .questions-block h4{{
+      font-size:.9rem; font-weight:600; color:var(--text);
+      margin-bottom:1rem; letter-spacing:.02em;
+    }}
+    .questions-block ul{{
+      margin:0; padding-left:1.2rem; list-style:disc;
+    }}
+    .questions-block li{{ margin-bottom:.6rem; }}
+    .questions-block li:last-child{{ margin-bottom:0; }}
+
     /* ---- TRANSITION CONNECTOR ---- */
     .connector{{
       display:flex; flex-direction:column; align-items:center;
@@ -830,6 +919,51 @@ HTML = f"""<!DOCTYPE html>
     }}
     .shift-block p strong{{ color:var(--text); font-weight:600; }}
 
+    /* ---- POLICY TIMELINE ---- */
+    .timeline{{ max-width:700px; margin:2rem 0; }}
+    .tl-item{{
+      position:relative;
+      padding:0 0 2rem 2.8rem;
+      border-left:1px solid rgba(255,255,255,0.08);
+    }}
+    .tl-item:last-child{{ padding-bottom:0; border-left-color:transparent; }}
+    .tl-item::before{{
+      content:'';
+      position:absolute; left:-4px; top:.45rem;
+      width:7px; height:7px; border-radius:50%;
+      background:var(--rose);
+    }}
+    .tl-year{{
+      font-size:.78rem; font-weight:700; color:var(--rose);
+      letter-spacing:.04em; margin-bottom:.25rem;
+    }}
+    .tl-item h4{{
+      font-size:.92rem; font-weight:600; color:#fff;
+      margin-bottom:.3rem; line-height:1.35;
+    }}
+    .tl-item p{{
+      font-size:.85rem; color:var(--muted); line-height:1.75;
+    }}
+    .tl-item p strong{{ color:var(--text); font-weight:600; }}
+
+    /* ---- INCENTIVE BLOCK ---- */
+    .incentive-block{{
+      padding:1.8rem 2rem;
+      border:1px solid rgba(244,63,94,0.2);
+      border-radius:8px;
+      background:rgba(244,63,94,0.04);
+      margin:2rem 0;
+      max-width:700px;
+    }}
+    .incentive-block h4{{
+      font-size:.92rem; font-weight:600; color:var(--rose);
+      margin-bottom:.8rem;
+    }}
+    .incentive-block p{{
+      font-size:.88rem; color:var(--muted); line-height:1.8;
+    }}
+    .incentive-block p strong{{ color:var(--text); font-weight:600; }}
+
     /* ---- METHODOLOGY ---- */
     .methodology{{
       background:var(--bg2); border-top:1px solid var(--border);
@@ -859,9 +993,10 @@ HTML = f"""<!DOCTYPE html>
     <p class="hero-sub">How 30 Looks Nothing Like It Used To</p>
 
     <p class="hero-lede">
-      In 1983, a 25-to-34-year-old in America could expect to be married, own a home, and
-      start a family. Four decades later, every one of those milestones has moved out of reach.
-      The data tells one story. The way it&rsquo;s measured tells another.
+      In 1983, a single income could buy a home, most 30-year-olds were married,
+      and starting a family was the default. Four decades later, every one of those
+      milestones has moved further out of reach &mdash; and the metrics used to track
+      them were quietly redesigned in ways that make the decline look smaller than it is.
     </p>
 
     <div class="sc-context">Life milestones for Americans aged 25&ndash;34</div>
@@ -893,7 +1028,7 @@ HTML = f"""<!DOCTYPE html>
       <div class="sc-row">
         <div class="sc-label">
           <div class="sc-metric">Homeownership</div>
-          <div class="sc-desc">Measured per household &mdash; today&rsquo;s households typically need two earners to qualify</div>
+          <div class="sc-desc">Per household &mdash; looks flat, but now requires two earners. Per-earner effective rate: ~{stats['ho_earner_new']:.0f}%</div>
         </div>
         <div class="sc-val old">{stats['homeown_1983']:.1f}%</div>
         <div class="sc-delta"><span class="material-symbols-outlined">trending_down</span></div>
@@ -921,9 +1056,10 @@ HTML = f"""<!DOCTYPE html>
 
     <p class="hero-body">
       Marriage fell <strong style="color:var(--amber)">{abs(pp_married):.0f} percentage points</strong>.
-      A median home now costs <strong style="color:var(--rose)">{stats['ratio_new']:.1f} years of household income</strong>.
-      The fertility rate sits <strong style="color:var(--emerald)">below replacement</strong> and is still falling.
-      The standard metrics make it look bad. The real numbers are worse.
+      A median home costs <strong style="color:var(--rose)">{stats['ratio_new']:.1f}&times; household income</strong>
+      &mdash; or <strong style="color:var(--violet)">{stats['pi_ratio_new']:.1f}&times;</strong> on a single salary.
+      The fertility rate sits <strong style="color:var(--emerald)">below replacement</strong> and falling.
+      These are the official numbers. The real picture is worse.
     </p>
     <a href="#sec-decline" class="hero-cta">Explore the data &rarr;</a>
     <div class="scroll-cue">&darr; scroll to explore &darr;</div>
@@ -967,7 +1103,7 @@ HTML = f"""<!DOCTYPE html>
       </div>
       <div class="stat" style="--i:2">
         <span class="stat-n" style="color:var(--emerald)">{stats['tfr_now']:.2f} births per woman</span>
-        <p>US fertility rate in {tfr_latest_yr}. Well below the <strong style="color:var(--emerald)">2.1</strong> replacement threshold &mdash; and falling &mdash; since 1972.</p>
+        <p>US fertility rate in {tfr_latest_yr}. Below the <strong style="color:var(--emerald)">2.1</strong> replacement threshold and falling to record lows since 2007.</p>
       </div>
     </div>
   </div>
@@ -977,7 +1113,7 @@ HTML = f"""<!DOCTYPE html>
 <div class="connector">
   <div class="connector-line"></div>
   <div class="connector-dot"></div>
-  <p class="reveal">Those are the official numbers. Now, three ways the tools used to measure them were changed at the exact moment the decline began.</p>
+  <p class="reveal">Those are the official numbers. But the tools used to produce them have blind spots &mdash; some by design, some by economic drift &mdash; that make the decline look smaller than it is.</p>
   <div class="connector-dot"></div>
   <div class="connector-line-b"></div>
 </div>
@@ -985,53 +1121,77 @@ HTML = f"""<!DOCTYPE html>
 <!-- ===== ACT 2: THE YARDSTICK CHANGED ===== -->
 <section id="sec-yardstick" class="sec">
   <div class="container">
-    <div class="sec-num reveal">02 &mdash; The Yardstick Changed</div>
-    <h2 class="reveal">Three Reporting Shifts That Hide the Crisis</h2>
+    <div class="sec-num reveal">02 &mdash; The Blind Spots</div>
+    <h2 class="reveal">One Methodology Change and Two Legacy Assumptions</h2>
     <p class="lead reveal">
-      The numbers in Section 01 are bad. They are also <strong>measured with tools that were redesigned
-      in the early 1980s</strong> &mdash; in each case, the change made the crisis look smaller than it is.
+      The numbers in Section 01 are bad. They are also <strong>measured with tools that no longer
+      reflect the economic reality they were built for</strong>. One was a deliberate methodology change.
+      The other two became misleading as the economy shifted around them.
     </p>
 
     <div class="shift-blocks">
       <div class="shift-block reveal">
-        <h4>CPI Methodology &mdash; January 1983</h4>
+        <h4>The Methodology Change: CPI &amp; Housing &mdash; January 1983</h4>
         <p>
           The Bureau of Labor Statistics stopped tracking the actual cost of buying a home &mdash;
           mortgage payments, property taxes, insurance, prices &mdash; and replaced it with
           <strong>Owners&rsquo; Equivalent Rent</strong> (OER): a survey asking homeowners what they
-          think it would cost to rent their place. OER now accounts for <strong>26.4%</strong> of
-          headline CPI, the single largest component. Every government statistic pegged to
-          &ldquo;inflation&rdquo; &mdash; Social Security, tax brackets, the poverty line &mdash;
-          now systematically undercounts the cost of the largest purchase most families ever make.
-          CPI-Shelter grew <strong style="color:var(--amber)">{stats['cpi_shelter_growth_x']:.1f}&times;</strong> since 1984.
-          Actual home prices grew <strong style="color:var(--rose)">{stats['hp_growth_x']:.1f}&times;</strong>.
+          <em>think</em> it would cost to rent their place. OER now accounts for roughly <strong>a quarter</strong> of
+          headline CPI (26&ndash;27% depending on year), the single largest component.
+        </p>
+        <p style="margin-top:.8rem;">
+          This matters because every government expenditure pegged to &ldquo;inflation&rdquo; &mdash;
+          Social Security COLAs, tax bracket adjustments, federal pensions, SNAP benefits &mdash;
+          now rises more slowly. A CPI that understates housing costs by even one percentage point
+          saves the federal government tens of billions per year. In 1996, the
+          <strong>Boskin Commission</strong> (appointed by the Senate Finance Committee) recommended
+          further reductions, arguing CPI overstated inflation by 1.1 points. The CBO estimated those
+          changes alone would save <strong>$1 trillion over 12 years</strong>.
+        </p>
+        <p style="margin-top:.8rem;">
+          Since 1984: CPI-Shelter grew
+          <strong style="color:var(--amber)">{stats['cpi_shelter_growth_x']:.1f}&times;</strong>.
+          Actual home prices grew
+          <strong style="color:var(--rose)">{stats['hp_growth_x']:.1f}&times;</strong>.
+          The gap between those two numbers is the cost this methodology change hides.
         </p>
       </div>
 
       <div class="shift-block reveal">
-        <h4>The Dual-Income Denominator</h4>
+        <h4>The Legacy Assumption: &ldquo;Household Income&rdquo; Means One Earner</h4>
         <p>
-          In 1984, &ldquo;household income&rdquo; typically meant <strong>one earner</strong>.
+          Nobody changed how household income is reported &mdash; the economy changed what a household
+          <em>is</em>. In 1984, &ldquo;household income&rdquo; typically meant <strong>one earner</strong>.
           Today it almost always means <strong>two</strong>. Average household size shrank from
-          <strong>2.73</strong> to <strong>2.51</strong> people. So when the standard charts show
-          household income growing <strong style="color:var(--sky)">{stats['hh_income_growth_x']:.1f}&times;</strong>, that growth
-          was achieved by <em>adding a second worker</em>, not by wages keeping up.
-          A single earner in 1984 needed <strong style="color:var(--violet)">{stats['pi_ratio_old']:.1f} years</strong>
-          of their paycheck to buy a home. A single earner today needs
-          <strong style="color:var(--violet)">{stats['pi_ratio_new']:.1f}&times;</strong> their annual income &mdash;
-          measured, not estimated (FRED MEPAINUSA646N).
+          <strong>2.73</strong> to <strong>2.51</strong> people
+          (Census Table HH-4). The standard charts show household income growing
+          <strong style="color:var(--sky)">{stats['hh_income_growth_x']:.1f}&times;</strong> &mdash; but that growth
+          came from <em>adding a second paycheck</em>, not from wages keeping up with prices.
+        </p>
+        <p style="margin-top:.8rem;">
+          A single earner in 1984 needed
+          <strong style="color:var(--violet)">{stats['pi_ratio_old']:.1f} years</strong>
+          of their income to buy a median home. Today:
+          <strong style="color:var(--violet)">{stats['pi_ratio_new']:.1f} years</strong>
+          (FRED MEPAINUSA646N &mdash; measured, not estimated).
+          The metric didn&rsquo;t change. The reality it describes did.
         </p>
       </div>
 
       <div class="shift-block reveal">
-        <h4>Homeownership &mdash; Per Household, Not Per Earner</h4>
+        <h4>The Consequence: Homeownership Is Counted Per Household, Not Per Person</h4>
         <p>
-          The homeownership rate is measured <em>per household</em>. When one income could hold a
-          household together, the household rate roughly approximated individual ownership. Now it
-          takes two incomes to qualify &mdash; two earners share one unit of &ldquo;homeownership.&rdquo;
-          The reported rate for under-35 households is <strong style="color:var(--sky)">{stats['homeown_now']:.1f}%</strong>.
-          Divide by the earners-per-household ratio and the effective per-earner rate drops to roughly
-          <strong style="color:var(--rose)">{stats['ho_earner_new']:.1f}%</strong> &mdash; half the headline.
+          This follows directly from the shift above. The homeownership rate is measured
+          <em>per household</em>. When one income could buy a house, the household rate roughly
+          approximated individual ownership. Now two earners pool their income to qualify for a
+          single mortgage &mdash; and share one unit of &ldquo;homeownership.&rdquo;
+        </p>
+        <p style="margin-top:.8rem;">
+          The reported rate for under-35 households:
+          <strong style="color:var(--sky)">{stats['homeown_now']:.1f}%</strong>.
+          Adjust for the number of earners per household and the effective per-person rate
+          drops to roughly <strong style="color:var(--rose)">{stats['ho_earner_new']:.1f}%</strong>
+          &mdash; nearly half the headline figure.
         </p>
       </div>
     </div>
@@ -1042,7 +1202,7 @@ HTML = f"""<!DOCTYPE html>
 <div class="connector">
   <div class="connector-line"></div>
   <div class="connector-dot"></div>
-  <p class="reveal">Now see what the numbers look like when you correct for those changes.</p>
+  <p class="reveal">Now see what the numbers look like when you account for these blind spots.</p>
   <div class="connector-dot"></div>
   <div class="connector-line-b"></div>
 </div>
@@ -1059,11 +1219,12 @@ HTML = f"""<!DOCTYPE html>
 
     <!-- Chart: Great Divergence -->
     <div class="aside reveal">
+      <h4>Reading this chart</h4>
       <strong style="color:var(--amber)">CPI: Shelter</strong> and
-      <strong style="color:var(--sky)">household income</strong> grew in near-lockstep &mdash;
-      by official measures, housing looks manageable.
-      The <strong style="color:var(--rose)">shaded gap</strong> between actual home prices and
-      the CPI: Shelter line is the distance the 1983 methodology change hides.
+      <strong style="color:var(--sky)">household income</strong> track each other closely &mdash;
+      by official measures, housing looks manageable.<br>
+      The <strong style="color:var(--rose)">shaded gap</strong> above the CPI line is the real cost
+      the 1983 OER methodology change masks. All three series start at 100 in 1984.
     </div>
     <div class="chart reveal">
       {chart_divergence}
@@ -1073,14 +1234,20 @@ HTML = f"""<!DOCTYPE html>
     <!-- Charts: Affordability paired -->
     <div class="paired reveal">
       <div class="aside">
-        <strong>Price-to-Income</strong> &mdash; years of gross income to buy a median home.
-        The <strong style="color:var(--rose)">household</strong> line is the industry standard.
-        The <strong style="color:var(--violet)">individual</strong> line is what a single earner actually faces.
+        <h4>Price-to-Income</h4>
+        Years of gross income to buy a median home.<br>
+        <strong style="color:var(--rose)">Household</strong> = industry standard (two earners).<br>
+        <strong style="color:var(--violet)">Individual</strong> = what a single earner actually faces.
       </div>
       <div class="aside">
-        <strong>Mortgage Burden</strong> &mdash; monthly payment as a share of income (20% down, 30-yr fixed).
-        The <strong style="color:var(--rose)">30%</strong> line is the standard cost-burden threshold.
-        A single earner today dedicates <strong style="color:var(--violet)">{stats['pi_pmt_new']:.0f}%</strong> of their paycheck.
+        <h4>Mortgage Burden</h4>
+        Monthly payment as % of income (20% down, 30-yr fixed).<br>
+        <strong style="color:var(--rose)">30% line</strong> = standard cost-burden threshold.<br>
+        A single earner today: <strong style="color:var(--violet)">{stats['pi_pmt_new']:.0f}%</strong> of their paycheck.<br>
+        <span style="color:var(--dim); font-size:.82rem;">
+          Note: in 1984 mortgage rates averaged {stats['rate_1984']:.1f}%. Today: ~{stats['rate_now']:.1f}%.
+          Despite much lower rates now, the raw price increase has made payments <em>less</em> affordable.
+        </span>
       </div>
       <div class="chart">
         {chart_affordability}
@@ -1094,9 +1261,10 @@ HTML = f"""<!DOCTYPE html>
 
     <!-- Chart: Per-earner homeownership -->
     <div class="aside reveal">
-      The <strong style="color:var(--sky)">reported</strong> homeownership rate vs. the
-      <strong style="color:var(--rose)">per-earner effective</strong> rate. The shaded gap
-      is ownership that only exists because two paychecks are pooled.
+      <h4>Reported vs. Per-Earner Homeownership</h4>
+      <strong style="color:var(--sky)">Blue</strong> = reported rate (per household).<br>
+      <strong style="color:var(--rose)">Red</strong> = effective rate per earner.<br>
+      The shaded gap is ownership that exists only because two paychecks are pooled into one mortgage.
     </div>
     <div class="chart reveal">
       {chart_ho_earner}
@@ -1105,25 +1273,154 @@ HTML = f"""<!DOCTYPE html>
 
     <!-- Chart: What your dollar buys -->
     <div class="aside reveal">
-      Even the physical product has shrunk. You pay more per square foot while the land under your home gets smaller.
+      <h4>And You Get Less For It</h4>
+      After paying more of your income for longer, the physical product has also shrunk.
+      Cost per square foot has climbed steadily while the median lot size has fallen &mdash;
+      more money for less house on less land.
     </div>
     <div class="chart reveal">
       {chart_whatyouget}
       <div class="chart-src">Sources: FRED MSPNHSUS / COMPSFLAM1FQ; Census SOC / Fed FEDS Notes</div>
     </div>
 
-    <div class="stats reveal">
-      <div class="stat" style="--i:0">
-        <span class="stat-n" style="color:var(--violet)">{stats['pi_ratio_old']:.1f}&times; &rarr; {stats['pi_ratio_new']:.1f}&times;</span>
-        <p>Price-to-<strong style="color:var(--violet)">individual</strong>-income ratio. The real cost of a home for a single earner &mdash; nearly double the household figure reported in headlines.</p>
+    <div class="closing reveal">
+      <p class="lead" style="font-size:1.1rem; color:#fff; border-left:3px solid var(--rose); padding-left:1.4rem;">
+        In 1984, a median home cost <strong style="color:var(--rose)">{stats['ratio_old']:.1f} years</strong>
+        of household income. In {yr_housing_latest_yr}, it costs
+        <strong style="color:var(--rose)">{stats['ratio_new']:.1f} years</strong>.
+        But &ldquo;household income&rdquo; in 1984 usually meant one paycheck. Today it means two.
+        Measured against a single earner&rsquo;s salary, a median home now costs
+        <strong style="color:var(--violet)">{stats['pi_ratio_new']:.1f} years</strong> of gross income.
+        The per-earner homeownership rate for under-35s is
+        <strong style="color:var(--rose)">{stats['ho_earner_new']:.1f}%</strong> &mdash;
+        not the <strong style="color:var(--sky)">{stats['homeown_now']:.1f}%</strong> the headlines report.
+      </p>
+      <p class="key-stats-inline" style="margin-top:1rem; font-style:italic;">
+        Mortgage rates fell from <strong>{stats['rate_1984']:.0f}%</strong> in 1984 to
+        <strong>{stats['rate_now']:.0f}%</strong> in {int(stats['rate_now_yr'])} &mdash;
+        a historic collapse in borrowing costs. Yet the monthly payment as a share of household income
+        barely budged (from ~<strong>{stats['pmt_hh_old']:.0f}%</strong> to
+        ~<strong>{stats['pmt_hh_new']:.0f}%</strong>). Every point of rate relief
+        was absorbed by rising prices.
+        The crisis isn&rsquo;t just that housing got harder.
+        It&rsquo;s that the standard metrics were not designed to show how much harder.
+      </p>
+
+      <h3 style="color:#fff; font-size:1.15rem; margin:3rem 0 .8rem; font-weight:700;">How We Got Here</h3>
+      <p class="key-stats-inline" style="margin-bottom:1.5rem;">
+        This didn&rsquo;t happen by accident. A series of policy decisions &mdash; each defensible in isolation &mdash;
+        compounded over four decades to produce the affordability crisis documented above. Here are the inflection points.
+      </p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">1983</div>
+          <h4>BLS replaces housing costs with Owners&rsquo; Equivalent Rent</h4>
+          <p>
+            The CPI stopped measuring what it actually costs to buy a home and switched to asking
+            homeowners what they think they&rsquo;d pay in rent. The change was proposed during the
+            Carter administration and implemented under Reagan. Every government expenditure tied to
+            inflation &mdash; Social Security, tax brackets, the poverty line &mdash; has since risen
+            more slowly than actual housing costs.
+          </p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1996</div>
+          <h4>The Boskin Commission recommends further CPI reductions</h4>
+          <p>
+            Appointed by the Senate Finance Committee, the commission argued that CPI overstated
+            inflation by <strong>1.1 percentage points per year</strong>. The Congressional Budget
+            Office estimated adopting these changes would save the federal government
+            <strong>roughly $1 trillion over 12 years</strong> through lower COLA payments.
+            Many of the recommendations were adopted. Lower measured inflation meant lower
+            government obligations &mdash; and a growing gap between official statistics and lived costs.
+          </p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">1997</div>
+          <h4>Taxpayer Relief Act: homes become tax-sheltered investments</h4>
+          <p>
+            Signed by President Clinton with bipartisan support, this law exempted up to
+            <strong>$250K/$500K in capital gains</strong> on home sales from taxation.
+            Overnight, a primary residence became the most tax-advantaged asset class available
+            to ordinary Americans. Existing homeowners now had a direct financial incentive to
+            support policies that raised property values &mdash; and oppose new construction that
+            might lower them.
+          </p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2001&ndash;2006</div>
+          <h4>The Fed holds rates near historic lows; lending standards collapse</h4>
+          <p>
+            The Greenspan and early Bernanke Fed kept rates exceptionally low after the dot-com
+            bust. Loose monetary policy, combined with the relaxation of lending standards and the
+            securitization of mortgages, inflated a housing bubble that priced a generation of
+            first-time buyers into debt they couldn&rsquo;t sustain.
+          </p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2012&ndash;present</div>
+          <h4>Institutional investors enter single-family housing</h4>
+          <p>
+            After the 2008 crash, private equity firms began purchasing foreclosed homes at scale.
+            <strong>Blackstone&rsquo;s Invitation Homes</strong> became the largest single-family
+            landlord in the United States. By 2023, institutional investors accounted for a significant
+            share of home purchases in many metro areas, competing directly with first-time buyers
+            and converting ownership stock into rental inventory.
+          </p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">Ongoing</div>
+          <h4>Local zoning blocks new supply; existing owners vote to protect values</h4>
+          <p>
+            Homeowners vote at higher rates than renters. Local zoning boards &mdash; elected by and
+            accountable to existing homeowners &mdash; routinely block new housing that might increase
+            supply and moderate prices. The result: a structural shortage that benefits those who
+            already own property at the direct expense of those trying to buy in.
+          </p>
+        </div>
       </div>
-      <div class="stat" style="--i:1">
-        <span class="stat-n" style="color:var(--rose)">{stats['ho_earner_new']:.1f}%</span>
-        <p><strong style="color:var(--rose)">Per-earner</strong> homeownership rate for under-35s. The headline says {stats['homeown_now']:.1f}%. The individual reality is roughly half.</p>
+
+      <div class="incentive-block">
+        <h4>Why the official numbers stay quiet</h4>
+        <p>
+          Governments don&rsquo;t just <em>measure</em> inflation &mdash; they <em>pay</em> based on it.
+          Social Security COLAs, military pay raises, SNAP benefits, federal pensions, and tax-bracket
+          adjustments are all indexed to CPI. A CPI that runs even <strong>one percentage point below
+          real housing costs</strong> saves the federal government tens of billions of dollars annually.
+          No administration &mdash; regardless of party &mdash; has a fiscal incentive to make the
+          number more accurate if accuracy means higher obligations. The Boskin Commission made this
+          logic explicit: lower CPI = lower deficits. The cost is borne by the people whose wages,
+          benefits, and purchasing power are benchmarked to a number that undercounts their largest expense.
+        </p>
       </div>
-      <div class="stat" style="--i:2">
-        <span class="stat-n" style="color:var(--violet)">{stats['pi_pmt_new']:.0f}%</span>
-        <p>A single earner&rsquo;s monthly mortgage burden. The household figure is {stats['pmt_hh_new']:.0f}%. The gap is the second paycheck masking the crisis.</p>
+
+      <!-- International context -->
+      <h3 style="color:#fff; font-size:1.15rem; margin:2.5rem 0 .8rem; font-weight:700;">Global Context: This Is Not Just an American Story</h3>
+      <p class="key-stats-inline" style="margin-bottom:1.5rem;">
+        The fertility decline is real and widespread. But the depth varies by policy environment.
+        Nations with aggressive pro-family investment (France) have maintained rates near replacement.
+        Nations where housing costs have outpaced wages most severely (South Korea, Japan)
+        show where the trend leads. The US sits in between &mdash; declining, and accelerating.
+      </p>
+      <div class="chart">
+        {chart_intl_tfr}
+        <div class="chart-src">Source: World Bank SP.DYN.TFRT.IN</div>
+      </div>
+
+      <div class="questions-block" style="margin-top:2.5rem;">
+        <h4>The question this data raises</h4>
+        <p style="font-size:.92rem; color:var(--muted); line-height:1.85; margin-bottom:1rem;">
+          Every data point above comes from a public source. The Census, FRED, BLS, and the World Bank
+          publish these numbers freely. The decline is not hidden &mdash; it&rsquo;s just measured with
+          tools that were built for a different economy, and nobody in a position of authority has an
+          incentive to update them.
+        </p>
+        <p style="font-size:.95rem; color:var(--text); line-height:1.85; font-weight:500;">
+          The question is not whether young Americans are worse off. The data is unambiguous.
+          The question is why the standard metrics were allowed to quietly drift out of alignment
+          with reality &mdash; and who benefits from the gap.
+        </p>
       </div>
     </div>
   </div>
@@ -1172,7 +1469,7 @@ HTML = f"""<!DOCTYPE html>
       <li><strong>CPI &amp; Shelter (1983):</strong> In January 1983, BLS replaced direct home-purchase
         cost tracking in the CPI with Owners&rsquo; Equivalent Rent (OER). OER measures what homeowners
         <em>would</em> pay to rent their home, not what it actually costs to buy one. OER now accounts
-        for 26.4% of headline CPI. As a result, CPI-U and all statistics adjusted by it (Social Security,
+        for roughly a quarter of headline CPI (26&ndash;27%). As a result, CPI-U and all statistics adjusted by it (Social Security,
         tax brackets, poverty thresholds) structurally undercount housing cost inflation.</li>
       <li><strong>Household Income (composition drift):</strong> Average household size fell from 2.73 (1983)
         to 2.51 (2023). Single-person households rose from ~22% to 29%. Dual-income households became the
@@ -1192,7 +1489,7 @@ HTML = f"""<!DOCTYPE html>
 </div>
 
 <footer>
-  <p>Data study by <strong>Data Adventures</strong> &middot; Built with Python, Plotly, Census Bureau, FRED, BLS</p>
+  <p>Data study by <strong>Data Story</strong> &middot; Built with Python, Plotly, Census Bureau, FRED, BLS</p>
   <p style="margin-top:.4rem;">All data from public sources. Every figure linked to its original table above.</p>
 </footer>
 
